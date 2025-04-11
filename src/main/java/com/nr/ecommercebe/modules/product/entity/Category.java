@@ -27,6 +27,7 @@ public class Category extends BaseEntity {
     Category parent;
 
     @OneToMany(mappedBy = "category", fetch = FetchType.LAZY)
+    @ToString.Exclude
     Set<Product> products;
 
     @Enumerated(EnumType.STRING)

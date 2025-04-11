@@ -32,9 +32,11 @@ public class Product extends BaseEntity {
     Category category;
 
     @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
+    @ToString.Exclude
     Set<ProductImage> productImages;
 
     @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
+    @ToString.Exclude
     Set<Review> reviews;
 
     @ManyToOne(fetch = FetchType.LAZY)
