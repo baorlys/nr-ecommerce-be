@@ -1,4 +1,4 @@
-package com.nr.ecommercebe.modules.product.entity;
+package com.nr.ecommercebe.module.product.entity;
 
 import com.nr.ecommercebe.shared.domain.enums.StorageType;
 import com.nr.ecommercebe.shared.domain.BaseEntity;

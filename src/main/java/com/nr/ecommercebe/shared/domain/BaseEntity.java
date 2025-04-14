@@ -3,6 +3,7 @@ package com.nr.ecommercebe.shared.domain;
 import com.github.f4b6a3.ulid.UlidCreator;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Data;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.FilterDef;
@@ -15,6 +16,7 @@ import java.time.LocalDate;
 import java.util.Objects;
 
 @MappedSuperclass
+@Data
 @EntityListeners(AuditingEntityListener.class)
 @FilterDef(name = "softDeleteFilter", parameters = @ParamDef(name = "isDeleted", type = boolean.class)) // Define filter for soft delete
 @Filter(name = "softDeleteFilter", condition = "is_deleted = :isDeleted") // Filter condition for soft delete

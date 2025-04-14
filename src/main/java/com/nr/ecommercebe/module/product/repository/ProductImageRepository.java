@@ -1,6 +1,6 @@
-package com.nr.ecommercebe.modules.product.repository;
+package com.nr.ecommercebe.module.product.repository;
 
-import com.nr.ecommercebe.modules.product.entity.ProductImage;
+import com.nr.ecommercebe.module.product.entity.ProductImage;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

@@ -1,4 +1,4 @@
-package com.nr.ecommercebe.modules.product.entity;
+package com.nr.ecommercebe.module.product.entity;
 
 
 import com.nr.ecommercebe.shared.domain.BaseEntity;
@@ -6,7 +6,6 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import java.math.BigDecimal;
 import java.util.Set;
 
 @Entity(name = "products")
@@ -22,25 +21,21 @@ public class Product extends BaseEntity {
 
     String description;
 
-    @Column(precision = 20, scale = 2, nullable = false)
-    BigDecimal price;
-
-    @Column(nullable = false, columnDefinition = "integer default 0")
-    Integer stockQuantity;
-
     @ManyToOne(fetch = FetchType.LAZY)
     Category category;
 
-    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "product",fetch = FetchType.LAZY)
     @ToString.Exclude
     Set<ProductImage> productImages;
 
-    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "product",fetch = FetchType.LAZY)
     @ToString.Exclude
     Set<Review> reviews;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    ProductStatus productStatus;
+    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
+    @ToString.Exclude
+
+    Set<ProductVariant> productVariants;
 
     Boolean isFeatured;
 }

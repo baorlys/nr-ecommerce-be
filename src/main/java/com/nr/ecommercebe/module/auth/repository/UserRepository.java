@@ -1,6 +1,6 @@
-package com.nr.ecommercebe.modules.user.repository;
+package com.nr.ecommercebe.module.auth.repository;
 
-import com.nr.ecommercebe.modules.user.entity.User;
+import com.nr.ecommercebe.module.auth.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface UserRepository extends JpaRepository<User, String> {

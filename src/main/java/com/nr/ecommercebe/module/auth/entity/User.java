@@ -1,4 +1,4 @@
-package com.nr.ecommercebe.modules.user.entity;
+package com.nr.ecommercebe.module.auth.entity;
 
 import com.nr.ecommercebe.shared.domain.BaseEntity;
 import jakarta.persistence.*;

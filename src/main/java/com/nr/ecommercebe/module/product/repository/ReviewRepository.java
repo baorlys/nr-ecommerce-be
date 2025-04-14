@@ -1,6 +1,6 @@
-package com.nr.ecommercebe.modules.product.repository;
+package com.nr.ecommercebe.module.product.repository;
 
-import com.nr.ecommercebe.modules.product.entity.Review;
+import com.nr.ecommercebe.module.product.entity.Review;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ReviewRepository extends JpaRepository<Review, String> {

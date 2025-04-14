@@ -1,6 +1,6 @@
-package com.nr.ecommercebe.modules.product.entity;
+package com.nr.ecommercebe.module.product.entity;
 
-import com.nr.ecommercebe.modules.user.entity.User;
+import com.nr.ecommercebe.module.auth.entity.User;
 import com.nr.ecommercebe.shared.domain.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
