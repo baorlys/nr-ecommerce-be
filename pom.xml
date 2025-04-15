@@ -32,8 +32,6 @@
         <ulid.version>5.2.3</ulid.version>
         <cloudinary.version>2.0.0</cloudinary.version>
         <modelmapper.version>3.2.1</modelmapper.version>
-        <querydsl.version>5.0.0</querydsl.version>
-
     </properties>
     <dependencies>
         <dependency>
