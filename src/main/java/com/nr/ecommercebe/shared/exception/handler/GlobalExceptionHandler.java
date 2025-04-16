@@ -1,30 +1,29 @@
 package com.nr.ecommercebe.shared.exception.handler;
 
-import org.springframework.context.support.DefaultMessageSourceResolvable;
+import com.nr.ecommercebe.shared.exception.ErrorResponse;
+import com.nr.ecommercebe.shared.exception.RecordNotFoundException;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.FieldError;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-import java.util.Map;
-import java.util.stream.Collectors;
+import java.time.LocalDateTime;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
-        Map<String, String> errors = ex.getBindingResult()
-                .getFieldErrors()
-                .stream()
-                .collect(Collectors.toMap(
-                        FieldError::getField,
-                        DefaultMessageSourceResolvable::getDefaultMessage,
-                        (msg1, msg2) -> msg1 + ", " + msg2 // handle multiple errors per field
-                ));
+    @ExceptionHandler(RecordNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleNotFoundException(RecordNotFoundException ex, HttpServletRequest request) {
+        ErrorResponse errorResponse = new ErrorResponse(
+                LocalDateTime.now(),
+                HttpStatus.NOT_FOUND.value(),
+                ex.getMessage(),
+                request.getRequestURI()
+        );
 
-        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(errorResponse);
     }
 }
