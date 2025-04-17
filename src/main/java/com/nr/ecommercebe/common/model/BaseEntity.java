@@ -37,7 +37,7 @@ public class BaseEntity {
     boolean isDeleted;
 
     @PrePersist
-    protected void assignUlidIfNeeded() {
+    protected void initUlid() {
         if (this.id == null) {
             this.id = UlidCreator.getUlid().toString();
         }

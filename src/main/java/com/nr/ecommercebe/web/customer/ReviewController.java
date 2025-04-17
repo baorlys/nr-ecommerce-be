@@ -20,9 +20,10 @@ public class ReviewController {
     ReviewService reviewService;
 
     @GetMapping
-    public ResponseEntity<PagedResponseSuccess<ReviewResponseDto>> getAll(@RequestParam (defaultValue = "0") int page,
-                                                          @RequestParam(defaultValue = "5") int size,
-                                                          @ModelAttribute ReviewFilter filter) {
+    public ResponseEntity<PagedResponseSuccess<ReviewResponseDto>> getAll(
+            @RequestParam (defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size,
+            @ModelAttribute ReviewFilter filter) {
         PageRequest pageRequest = PageRequest.of(page, size);
         Page<ReviewResponseDto> reviewPage = reviewService.getAll(filter, pageRequest);
         return ResponseEntity.ok(new PagedResponseSuccess<>("Review fetched successfully",reviewPage));

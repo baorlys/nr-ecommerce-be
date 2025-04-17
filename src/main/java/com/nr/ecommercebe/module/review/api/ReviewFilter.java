@@ -3,6 +3,8 @@ package com.nr.ecommercebe.module.review.api;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -12,4 +14,5 @@ public class ReviewFilter {
     String productId;
     String sortBy;
     String sortDirection;
+    List<Integer> ratings;
 }

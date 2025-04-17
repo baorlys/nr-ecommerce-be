@@ -2,20 +2,20 @@ package com.nr.ecommercebe.module.review.service;
 
 import com.nr.ecommercebe.common.exception.ErrorCode;
 import com.nr.ecommercebe.common.exception.RecordNotFoundException;
-import com.nr.ecommercebe.module.catalog.api.response.ProductDetailResponseDto;
-import com.nr.ecommercebe.module.catalog.model.Product;
 import com.nr.ecommercebe.module.review.api.ReviewFilter;
 import com.nr.ecommercebe.module.review.api.ReviewRequestDto;
 import com.nr.ecommercebe.module.review.api.ReviewResponseDto;
 import com.nr.ecommercebe.module.review.api.ReviewService;
 import com.nr.ecommercebe.module.review.model.Review;
 import com.nr.ecommercebe.module.review.repository.ReviewRepository;
+import com.nr.ecommercebe.module.review.repository.specification.ReviewSpecsBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -60,6 +60,15 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     public Page<ReviewResponseDto> getAll(ReviewFilter filter, Pageable pageable) {
-        return null;
+        Specification<Review> specsBuilder = new ReviewSpecsBuilder()
+                .withProductId(filter.getProductId())
+                .withRatings(filter.getRatings())
+                .withSortBy(filter.getSortBy(), filter.getSortDirection())
+                .build();
+
+        return  reviewRepository.findBy(
+                specsBuilder,
+                    query -> query.as(ReviewResponseDto.class).page(pageable)
+        );
     }
 }
