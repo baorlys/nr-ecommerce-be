@@ -2,7 +2,7 @@ package com.nr.ecommercebe.web.admin;
 
 import com.nr.ecommercebe.module.catalog.api.request.ProductRequestDto;
 import com.nr.ecommercebe.module.catalog.api.response.ProductDetailResponseDto;
-import com.nr.ecommercebe.module.catalog.service.ProductService;
+import com.nr.ecommercebe.module.catalog.api.ProductService;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;

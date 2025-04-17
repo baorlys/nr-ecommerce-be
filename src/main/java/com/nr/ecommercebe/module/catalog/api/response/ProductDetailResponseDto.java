@@ -1,7 +1,5 @@
 package com.nr.ecommercebe.module.catalog.api.response;
 
-import com.nr.ecommercebe.module.catalog.api.shared.ProductImageDto;
-import com.nr.ecommercebe.module.catalog.api.shared.ProductVariantDto;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -15,8 +13,8 @@ public class ProductDetailResponseDto {
     String name;
     String description;
     CategoryResponseDto category;
-    List<ProductVariantDto> productVariants;
-    List<ProductImageDto> productImages;
+    List<ProductVariantResponseDto> productVariants;
+    List<ProductImageResponseDto> productImages;
     Double averageRating;
     Long totalReviews;
 

@@ -1,7 +1,7 @@
 package com.nr.ecommercebe.web.customer;
 
 import com.nr.ecommercebe.module.catalog.api.response.CategoryResponseDto;
-import com.nr.ecommercebe.module.catalog.service.CategoryService;
+import com.nr.ecommercebe.module.catalog.api.CategoryService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;

@@ -5,6 +5,7 @@ import com.nr.ecommercebe.module.catalog.api.response.CategoryResponseDto;
 import com.nr.ecommercebe.module.catalog.api.response.ProductDetailResponseDto;
 import com.nr.ecommercebe.module.catalog.api.response.ProductResponseDto;
 import com.nr.ecommercebe.module.catalog.model.*;
+import com.nr.ecommercebe.module.review.model.Review;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
