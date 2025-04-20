@@ -3,11 +3,13 @@ package com.nr.ecommercebe.web;
 import com.nr.ecommercebe.common.utils.CookieUtil;
 import com.nr.ecommercebe.module.user.api.*;
 import com.nr.ecommercebe.module.user.service.JwtService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.apache.hc.core5.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -60,22 +62,41 @@ public class AuthController {
                 Duration.ofMillis(jwtService.getRefreshExpiration())
         );
 
-        response.addHeader("Set-Cookie", accessTokenCookie.toString());
-        response.addHeader("Set-Cookie", refreshTokenCookie.toString());
+        response.addHeader(HttpHeaders.SET_COOKIE, accessTokenCookie.toString());
+        response.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
 
         return ResponseEntity.ok(loginResponse.getUser());
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout(@RequestBody @Valid String token) {
-        authService.logout(token);
+    public ResponseEntity<Void> logout(
+            HttpServletRequest request,
+            HttpServletResponse response) {
+
+        String refreshToken = CookieUtil.getCookieValue(request, CookieUtil.REFRESH_TOKEN_NAME);
+        authService.logout(refreshToken);
+        ResponseCookie clearAccessTokenCookie = CookieUtil.clearAccessTokenCookie();
+        ResponseCookie clearRefreshTokenCookie = CookieUtil.clearRefreshTokenCookie();
+
+        response.addHeader(HttpHeaders.SET_COOKIE, clearAccessTokenCookie.toString());
+        response.addHeader(HttpHeaders.SET_COOKIE, clearRefreshTokenCookie.toString());
+
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/refresh-token")
-    public ResponseEntity<String> refreshToken(@RequestBody @Valid String refreshToken) {
+    public ResponseEntity<Void> refreshToken(HttpServletRequest request,
+                                             HttpServletResponse response) {
+        String refreshToken = CookieUtil.getCookieValue(request, CookieUtil.REFRESH_TOKEN_NAME);
         String newAccessToken = authService.refreshToken(refreshToken);
-        return ResponseEntity.ok(newAccessToken);
+
+        ResponseCookie accessTokenCookie = CookieUtil.createAccessTokenCookie(
+                newAccessToken,
+                Duration.ofMillis(jwtService.getAccessExpiration())
+        );
+
+        response.addHeader(HttpHeaders.SET_COOKIE, accessTokenCookie.toString());
+        return ResponseEntity.noContent().build();
     }
 
 

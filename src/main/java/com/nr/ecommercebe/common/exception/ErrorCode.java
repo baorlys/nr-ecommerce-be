@@ -18,7 +18,10 @@ public enum ErrorCode {
     USER_EMAIL_NOT_FOUND("user.email.not.found", "User not found",
             "User with email %s not found"),
     INVALID_CREDENTIAL("invalid.user.password", "Invalid email or password",
-            "Invalid email or password"),;
+            "Invalid email or password"),
+    JWT_IS_INVALID("jwt.is_invalid", "JWT is invalid",
+            "JWT is invalid"),
+    ;
 
 
 

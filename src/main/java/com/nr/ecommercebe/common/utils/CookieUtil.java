@@ -13,8 +13,8 @@ public class CookieUtil {
     private static final boolean HTTP_ONLY = true;
     private static final boolean SECURE = true;
     private static final String SAME_SITE = "Strict"; // or "Lax" depending on your needs
-    private static final String ACCESS_TOKEN_NAME = "accessToken";
-    private static final String REFRESH_TOKEN_NAME = "refreshToken";
+    public static final String ACCESS_TOKEN_NAME = "accessToken";
+    public static final String REFRESH_TOKEN_NAME = "refreshToken";
 
     private CookieUtil() {
         // Prevent instantiation

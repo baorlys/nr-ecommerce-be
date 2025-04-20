@@ -4,15 +4,13 @@ import com.nr.ecommercebe.common.exception.ErrorCode;
 import com.nr.ecommercebe.common.exception.RecordNotFoundException;
 import com.nr.ecommercebe.common.service.CommonExceptionService;
 import com.nr.ecommercebe.module.user.api.*;
-import com.nr.ecommercebe.module.user.model.RoleName;
 import com.nr.ecommercebe.module.user.model.TokenType;
 import com.nr.ecommercebe.module.user.model.User;
-import com.nr.ecommercebe.module.user.repository.RoleRepository;
 import com.nr.ecommercebe.module.user.repository.UserRepository;
+import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.ModelMapper;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -69,7 +67,14 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public String refreshToken(String refreshToken) {
-        return "";
+        if(!jwtService.isTokenValid(refreshToken)) {
+            throw new JwtException(ErrorCode.JWT_IS_INVALID.getMessage());
+        }
+        String userEmail = jwtService.getUsername(refreshToken);
+        User user = userRepository.findUserByEmail(userEmail).orElseThrow(
+                () -> new RecordNotFoundException(ErrorCode.USER_EMAIL_NOT_FOUND.getMessage())
+        );
+        return jwtService.generateAccessToken(new CustomUserDetails(user));
     }
 
     @Override
