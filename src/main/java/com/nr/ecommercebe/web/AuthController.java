@@ -1,10 +1,14 @@
 package com.nr.ecommercebe.web;
 
+import com.nr.ecommercebe.common.utils.CookieUtil;
 import com.nr.ecommercebe.module.user.api.*;
+import com.nr.ecommercebe.module.user.service.JwtService;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -13,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.time.Duration;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -20,6 +25,7 @@ import java.net.URI;
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class AuthController {
     AuthService authService;
+    JwtService jwtService;
 
     @PostMapping("/register")
     public ResponseEntity<RegisterResponseDto> register(@RequestBody @Valid RegisterRequestDto registerRequestDto) {
@@ -40,9 +46,24 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponseDto> login(@RequestBody @Valid LoginRequestDto loginRequestDto) {
-        LoginResponseDto response = authService.login(loginRequestDto);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<UserResponseDto> login(@RequestBody @Valid LoginRequestDto loginRequestDto,
+                                                  HttpServletResponse response) {
+        LoginResponseDto loginResponse = authService.login(loginRequestDto);
+
+
+        ResponseCookie accessTokenCookie = CookieUtil.createAccessTokenCookie(
+                loginResponse.getAccessToken(),
+                Duration.ofMillis(jwtService.getAccessExpiration())
+        );
+        ResponseCookie refreshTokenCookie = CookieUtil.createRefreshTokenCookie(
+                loginResponse.getRefreshToken(),
+                Duration.ofMillis(jwtService.getRefreshExpiration())
+        );
+
+        response.addHeader("Set-Cookie", accessTokenCookie.toString());
+        response.addHeader("Set-Cookie", refreshTokenCookie.toString());
+
+        return ResponseEntity.ok(loginResponse.getUser());
     }
 
     @PostMapping("/logout")

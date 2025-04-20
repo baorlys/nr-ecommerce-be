@@ -1,5 +1,6 @@
 package com.nr.ecommercebe.module.user.api;
 
+import com.nr.ecommercebe.module.user.model.TokenType;
 import lombok.Builder;
 import lombok.Data;
 
@@ -8,6 +9,6 @@ import lombok.Data;
 public class LoginResponseDto {
     String accessToken;
     String refreshToken;
-    String tokenType;
+    TokenType tokenType;
     UserResponseDto user;
 }

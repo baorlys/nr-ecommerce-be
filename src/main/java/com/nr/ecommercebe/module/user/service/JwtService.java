@@ -6,6 +6,7 @@ import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -14,6 +15,7 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 @Service
@@ -44,21 +46,38 @@ public class JwtService {
         this.publicKey = PemUtil.loadPublicKey(publicKeyResource);
     }
 
-    public String generateAccessToken(String userId) {
-        return buildToken(userId, accessExpiration, Map.of("type", "access"));
+    public String generateAccessToken(CustomUserDetails userDetails) {
+        return buildToken(userDetails, accessExpiration, new HashMap<>(Map.of("type", "access")));
     }
 
-    public String generateRefreshToken(String userId) {
-        return buildToken(userId, refreshExpiration, Map.of("type", "refresh"));
+    public String generateRefreshToken(CustomUserDetails userDetails) {
+        return buildToken(userDetails, refreshExpiration, new HashMap<>(Map.of("type", "refresh")));
     }
 
-    private String buildToken(String userId, long expirationMillis, Map<String, Object> claims) {
+    public Long getAccessExpiration() {
+        return accessExpiration;
+    }
+
+    public Long getRefreshExpiration() {
+        return refreshExpiration;
+    }
+
+    private String buildToken(CustomUserDetails userDetails, long expirationMillis, Map<String, Object> claims) {
+        Date now = new Date();
+        Date expirationDate = new Date(now.getTime() + expirationMillis);
+
+        String role = userDetails.getAuthorities().stream()
+                .findFirst()
+                .map(GrantedAuthority::getAuthority)
+                .orElse("UNKNOWN");
+        claims.put("role", role);
+
         return Jwts.builder()
+                .subject(userDetails.getUsername())
                 .claims(claims)
-                .subject(userId)
                 .issuer(issuer)
-                .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + expirationMillis))
+                .issuedAt(now)
+                .expiration(expirationDate)
                 .signWith(privateKey, Jwts.SIG.RS256)
                 .compact();
     }
@@ -72,7 +91,7 @@ public class JwtService {
         }
     }
 
-    public String getUserId(String token) {
+    public String getUsername(String token) {
         return parseToken(token).getPayload().getSubject();
     }
 

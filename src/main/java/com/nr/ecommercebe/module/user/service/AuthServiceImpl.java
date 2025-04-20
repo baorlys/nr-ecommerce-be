@@ -5,6 +5,7 @@ import com.nr.ecommercebe.common.exception.RecordNotFoundException;
 import com.nr.ecommercebe.common.service.CommonExceptionService;
 import com.nr.ecommercebe.module.user.api.*;
 import com.nr.ecommercebe.module.user.model.RoleName;
+import com.nr.ecommercebe.module.user.model.TokenType;
 import com.nr.ecommercebe.module.user.model.User;
 import com.nr.ecommercebe.module.user.repository.RoleRepository;
 import com.nr.ecommercebe.module.user.repository.UserRepository;
@@ -41,15 +42,16 @@ public class AuthServiceImpl implements AuthService {
         if (!passwordEncoder.matches(loginRequestDto.getPassword(), user.getPasswordHash())) {
             throw new BadCredentialsException(ErrorCode.INVALID_CREDENTIAL.getMessage());
         }
-        UserResponseDto userResponseDto = mapper.toDTO(user);
-        String accessToken = jwtService.generateAccessToken(user.getId());
-        String refreshToken = jwtService.generateRefreshToken(user.getId());
+
+        CustomUserDetails userDetails = new CustomUserDetails(user);
+        String accessToken = jwtService.generateAccessToken(userDetails);
+        String refreshToken = jwtService.generateRefreshToken(userDetails);
 
         return LoginResponseDto.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
-                .tokenType("Bearer")
-                .user(userResponseDto)
+                .tokenType(TokenType.BEARER)
+                .user(mapper.toDTO(user))
                 .build();
     }
 
