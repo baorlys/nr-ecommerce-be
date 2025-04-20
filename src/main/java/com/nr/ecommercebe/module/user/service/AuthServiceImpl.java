@@ -1,0 +1,77 @@
+package com.nr.ecommercebe.module.user.service;
+
+import com.nr.ecommercebe.common.exception.ErrorCode;
+import com.nr.ecommercebe.common.exception.RecordNotFoundException;
+import com.nr.ecommercebe.common.service.CommonExceptionService;
+import com.nr.ecommercebe.module.user.api.*;
+import com.nr.ecommercebe.module.user.model.RoleName;
+import com.nr.ecommercebe.module.user.model.User;
+import com.nr.ecommercebe.module.user.repository.RoleRepository;
+import com.nr.ecommercebe.module.user.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+@Transactional
+@Slf4j
+@RequiredArgsConstructor
+@FieldDefaults(makeFinal = true, level = lombok.AccessLevel.PRIVATE)
+public class AuthServiceImpl implements AuthService {
+    UserRepository userRepository;
+
+    RoleCache roleCache;
+    PasswordEncoder passwordEncoder;
+    JwtService jwtService;
+
+    UserMapper mapper;
+
+
+    @Override
+    public LoginResponseDto login(LoginRequestDto loginRequestDto) {
+        User user = userRepository.findUserByEmail((loginRequestDto.getEmail())).orElseThrow(
+                () -> new RecordNotFoundException(ErrorCode.USER_EMAIL_NOT_FOUND.getMessage())
+        );
+
+        if (!passwordEncoder.matches(loginRequestDto.getPassword(), user.getPasswordHash())) {
+            throw new BadCredentialsException(ErrorCode.INVALID_CREDENTIAL.getMessage());
+        }
+        UserResponseDto userResponseDto = mapper.toDTO(user);
+        String accessToken = jwtService.generateAccessToken(user.getId());
+        String refreshToken = jwtService.generateRefreshToken(user.getId());
+
+        return LoginResponseDto.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .tokenType("Bearer")
+                .user(userResponseDto)
+                .build();
+    }
+
+    @Override
+    public String register(RegisterRequestDto registerRequestDto) {
+        Boolean isEmailExist = userRepository.existsByEmail(registerRequestDto.getEmail());
+        CommonExceptionService.throwRecordExists(isEmailExist, ErrorCode.EMAIL_EXISTS.getMessage());
+
+        User user = mapper.toEntity(registerRequestDto);
+        user.setPasswordHash(passwordEncoder.encode(registerRequestDto.getPassword()));
+        user.setRole(roleCache.getUserRole());
+
+        return userRepository.save(user).getId();
+    }
+
+    @Override
+    public String refreshToken(String refreshToken) {
+        return "";
+    }
+
+    @Override
+    public void logout(String token) {
+
+    }
+}
