@@ -40,10 +40,10 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         String jwtToken = CookieUtil.getCookieValue(request, CookieUtil.ACCESS_TOKEN_NAME);
 
         if (jwtToken != null && jwtService.isTokenValid(jwtToken)) {
-            String email = jwtService.getUsername(jwtToken);
+            String userId = jwtService.getUsername(jwtToken);
             String role = jwtService.getRole(jwtToken);
             UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                            email,
+                            userId,
                             null,
                             List.of(new SimpleGrantedAuthority("ROLE_" + role)
                         ));
