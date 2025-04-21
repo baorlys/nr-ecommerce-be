@@ -1,13 +1,14 @@
 package com.nr.ecommercebe.module.catalog.api.request;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
-import java.util.List;
+import java.util.Set;
 
 @Data
 @NoArgsConstructor
@@ -20,7 +21,9 @@ public class ProductRequestDto {
     String description;
     @NotBlank(message = "Product category is required")
     String categoryId;
-    List<ProductImageRequestDto> productImages;
-    List<ProductVariantRequestDto> productVariants;
+    @NotNull
+    Set<ProductImageRequestDto> productImages;
+    @NotNull
+    Set<ProductVariantRequestDto> productVariants;
     Boolean isFeatured;
 }

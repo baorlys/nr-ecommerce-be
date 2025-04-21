@@ -8,14 +8,17 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 @Entity(name = "product_images")
-@Data
-@EqualsAndHashCode(callSuper = true)
+@Getter
+@Setter
+@ToString(exclude = {"product"})
+@EqualsAndHashCode(callSuper = true, exclude = {"product"})
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ProductImage extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(nullable = false)
     Product product;
 
     @Column(nullable = false)

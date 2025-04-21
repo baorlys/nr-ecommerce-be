@@ -9,8 +9,10 @@ import lombok.experimental.FieldDefaults;
 import java.math.BigDecimal;
 
 @Entity(name = "product_variants")
-@Data
-@EqualsAndHashCode(callSuper = true)
+@Getter
+@Setter
+@ToString(exclude = {"product"})
+@EqualsAndHashCode(callSuper = true, exclude = {"product"})
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor

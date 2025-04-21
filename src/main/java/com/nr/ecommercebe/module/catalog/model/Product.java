@@ -10,7 +10,9 @@ import lombok.experimental.FieldDefaults;
 import java.util.Set;
 
 @Entity(name = "products")
-@Data
+@Getter
+@Setter
+@ToString(exclude = {"productVariants", "productImages", "reviews"})
 @EqualsAndHashCode(callSuper = true)
 @Builder
 @AllArgsConstructor
@@ -25,18 +27,14 @@ public class Product extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     Category category;
 
-    @OneToMany(mappedBy = "product",fetch = FetchType.LAZY)
-    @ToString.Exclude
+    @OneToMany(mappedBy = "product",fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     Set<ProductImage> productImages;
 
-    @OneToMany(mappedBy = "product",fetch = FetchType.LAZY)
-    @ToString.Exclude
-    Set<Review> reviews;
-
-    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
-    @ToString.Exclude
-
+    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     Set<ProductVariant> productVariants;
+
+    @OneToMany(mappedBy = "product",fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    Set<Review> reviews;
 
     Boolean isFeatured;
 }

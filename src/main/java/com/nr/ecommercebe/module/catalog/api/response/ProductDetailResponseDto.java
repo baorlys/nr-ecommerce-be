@@ -7,6 +7,7 @@ import java.util.List;
 
 @Getter
 @Setter
+@NoArgsConstructor
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
 public class ProductDetailResponseDto {
     String id;

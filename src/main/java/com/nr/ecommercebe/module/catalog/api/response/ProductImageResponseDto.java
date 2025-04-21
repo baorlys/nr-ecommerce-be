@@ -1,10 +1,13 @@
 package com.nr.ecommercebe.module.catalog.api.response;
 
-public interface ProductImageResponseDto {
-    String getId();
-    String getImageUrl();
-    String getAltText();
-    Boolean getIsPrimary();
-    Integer getSortOrder();
-    String getStorageType();
+import com.nr.ecommercebe.common.model.StorageType;
+
+public record ProductImageResponseDto(
+        String id,
+        String imageUrl,
+        String altText,
+        Boolean isPrimary,
+        Integer sortOrder,
+        StorageType storageType
+) {
 }
