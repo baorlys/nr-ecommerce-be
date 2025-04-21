@@ -1,13 +1,14 @@
 package com.nr.ecommercebe.module.user.service;
 
 import com.nr.ecommercebe.common.exception.ErrorCode;
-import com.nr.ecommercebe.common.exception.RecordNotFoundException;
 import com.nr.ecommercebe.common.service.CommonExceptionService;
 import com.nr.ecommercebe.module.user.api.*;
 import com.nr.ecommercebe.module.user.api.request.LoginRequestDto;
 import com.nr.ecommercebe.module.user.api.request.RegisterRequestDto;
 import com.nr.ecommercebe.module.user.api.response.LoginResponseDto;
 import com.nr.ecommercebe.module.user.initializer.RoleCache;
+import com.nr.ecommercebe.module.user.model.Role;
+import com.nr.ecommercebe.module.user.model.RoleName;
 import com.nr.ecommercebe.module.user.model.TokenType;
 import com.nr.ecommercebe.module.user.model.User;
 import com.nr.ecommercebe.module.user.repository.UserRepository;
@@ -73,10 +74,15 @@ public class AuthServiceImpl implements AuthService {
         if(!jwtService.isTokenValid(refreshToken)) {
             throw new JwtException(ErrorCode.JWT_IS_INVALID.getMessage());
         }
-        String userEmail = jwtService.getUsername(refreshToken);
-        User user = userRepository.findUserByEmail(userEmail).orElseThrow(
-                () -> new RecordNotFoundException(ErrorCode.USER_EMAIL_NOT_FOUND.getMessage())
-        );
+
+        String userId = jwtService.getUsername(refreshToken);
+        String roleName = jwtService.getRole(refreshToken).replace("ROLE_", "");
+        Role role = roleCache.getRoleByName(RoleName.valueOf(roleName));
+
+        User user = new User();
+        user.setId(userId);
+        user.setRole(role);
+
         return jwtService.generateAccessToken(new CustomUserDetails(user));
     }
 

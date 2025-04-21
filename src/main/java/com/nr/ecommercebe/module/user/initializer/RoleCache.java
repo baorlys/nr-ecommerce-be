@@ -24,4 +24,11 @@ public class RoleCache {
         );
     }
 
+    public Role getRoleByName(RoleName roleName) {
+        return switch (roleName) {
+            case USER -> userRole;
+            case ADMIN -> adminRole;
+        };
+    }
+
 }
