@@ -95,18 +95,14 @@ public class JwtService {
         return parseToken(token).getPayload().getSubject();
     }
 
-    public boolean isAccessToken(String token) {
-        return "access".equals(parseToken(token).getPayload().get("type"));
-    }
-
-    public boolean isRefreshToken(String token) {
-        return "refresh".equals(parseToken(token).getPayload().get("type"));
-    }
-
     private Jws<Claims> parseToken(String token) {
         return Jwts.parser()
                 .verifyWith(publicKey)
                 .build()
                 .parseSignedClaims(token);
+    }
+
+    public String getRole(String token) {
+        return parseToken(token).getPayload().get("role", String.class);
     }
 }

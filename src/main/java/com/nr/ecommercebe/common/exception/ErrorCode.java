@@ -21,7 +21,8 @@ public enum ErrorCode {
             "Invalid email or password"),
     JWT_IS_INVALID("jwt.is_invalid", "JWT is invalid",
             "JWT is invalid"),
-    ;
+    UNAUTHORIZED("unauthorized", "Access denied. Invalid or missing token.",
+            "Unauthorized access");
 
 
 

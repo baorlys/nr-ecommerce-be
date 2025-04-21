@@ -11,7 +11,9 @@ import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +27,7 @@ public class AuthServiceImpl implements AuthService {
     UserRepository userRepository;
 
     RoleCache roleCache;
+    AuthenticationManager authManager;
     PasswordEncoder passwordEncoder;
     JwtService jwtService;
 
@@ -33,23 +36,19 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public LoginResponseDto login(LoginRequestDto loginRequestDto) {
-        User user = userRepository.findUserByEmail((loginRequestDto.getEmail())).orElseThrow(
-                () -> new RecordNotFoundException(ErrorCode.USER_EMAIL_NOT_FOUND.getMessage())
-        );
+        Authentication auth = authManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequestDto.getEmail(), loginRequestDto.getPassword()));
+        CustomUserDetails userDetails = (CustomUserDetails) auth.getPrincipal();
 
-        if (!passwordEncoder.matches(loginRequestDto.getPassword(), user.getPasswordHash())) {
-            throw new BadCredentialsException(ErrorCode.INVALID_CREDENTIAL.getMessage());
-        }
-
-        CustomUserDetails userDetails = new CustomUserDetails(user);
         String accessToken = jwtService.generateAccessToken(userDetails);
         String refreshToken = jwtService.generateRefreshToken(userDetails);
+
+
 
         return LoginResponseDto.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .tokenType(TokenType.BEARER)
-                .user(mapper.toDTO(user))
+                .user(mapper.toDTO(userDetails.user()))
                 .build();
     }
 
@@ -79,6 +78,6 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public void logout(String token) {
-
+        // Implement blacklist token logic
     }
 }
