@@ -41,7 +41,7 @@ public class SecurityConfig  {
                                 .authenticationEntryPoint(authenticationEntryPoint)
                 )
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/v1/products").authenticated()
                         .requestMatchers("/api/v1/**").permitAll()
 

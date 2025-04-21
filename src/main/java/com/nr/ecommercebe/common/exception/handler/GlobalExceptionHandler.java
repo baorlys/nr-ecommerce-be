@@ -93,7 +93,7 @@ public class GlobalExceptionHandler {
                 "An unexpected error occurred",
                 request.getRequestURI()
         );
-        log.error(ex.getMessage());
+        log.error(ex.toString());
 
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
