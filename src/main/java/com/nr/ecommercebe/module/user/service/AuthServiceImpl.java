@@ -7,6 +7,7 @@ import com.nr.ecommercebe.module.user.api.*;
 import com.nr.ecommercebe.module.user.api.request.LoginRequestDto;
 import com.nr.ecommercebe.module.user.api.request.RegisterRequestDto;
 import com.nr.ecommercebe.module.user.api.response.LoginResponseDto;
+import com.nr.ecommercebe.module.user.initializer.RoleCache;
 import com.nr.ecommercebe.module.user.model.TokenType;
 import com.nr.ecommercebe.module.user.model.User;
 import com.nr.ecommercebe.module.user.repository.UserRepository;

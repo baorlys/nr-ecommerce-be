@@ -1,5 +1,6 @@
 package com.nr.ecommercebe.module.user.service;
 
+import com.nr.ecommercebe.module.user.api.CustomUserDetails;
 import com.nr.ecommercebe.module.user.repository.UserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;

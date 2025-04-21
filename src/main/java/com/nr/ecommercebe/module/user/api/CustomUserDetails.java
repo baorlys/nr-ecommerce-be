@@ -1,4 +1,4 @@
-package com.nr.ecommercebe.module.user.service;
+package com.nr.ecommercebe.module.user.api;
 
 import com.nr.ecommercebe.module.user.model.User;
 import org.springframework.security.core.GrantedAuthority;

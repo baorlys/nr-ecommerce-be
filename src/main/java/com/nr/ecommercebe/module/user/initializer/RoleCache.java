@@ -1,4 +1,4 @@
-package com.nr.ecommercebe.module.user.service;
+package com.nr.ecommercebe.module.user.initializer;
 
 import com.nr.ecommercebe.common.exception.RecordNotFoundException;
 import com.nr.ecommercebe.module.user.model.Role;

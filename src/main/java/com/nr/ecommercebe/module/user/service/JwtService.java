@@ -1,6 +1,7 @@
 package com.nr.ecommercebe.module.user.service;
 
 import com.nr.ecommercebe.common.utils.PemUtil;
+import com.nr.ecommercebe.module.user.api.CustomUserDetails;
 import io.jsonwebtoken.*;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
