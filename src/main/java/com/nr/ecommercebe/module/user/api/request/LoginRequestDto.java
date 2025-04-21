@@ -1,4 +1,4 @@
-package com.nr.ecommercebe.module.user.api;
+package com.nr.ecommercebe.module.user.api.request;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;

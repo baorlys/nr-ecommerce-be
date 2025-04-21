@@ -1,4 +1,4 @@
-package com.nr.ecommercebe.module.user.api;
+package com.nr.ecommercebe.module.user.api.request;
 
 import com.nr.ecommercebe.module.user.api.validation.PasswordMatch;
 import jakarta.validation.constraints.*;

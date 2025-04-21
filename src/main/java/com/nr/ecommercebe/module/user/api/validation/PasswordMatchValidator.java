@@ -1,6 +1,6 @@
 package com.nr.ecommercebe.module.user.api.validation;
 
-import com.nr.ecommercebe.module.user.api.RegisterRequestDto;
+import com.nr.ecommercebe.module.user.api.request.RegisterRequestDto;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 

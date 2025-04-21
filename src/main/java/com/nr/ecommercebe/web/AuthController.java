@@ -2,6 +2,11 @@ package com.nr.ecommercebe.web;
 
 import com.nr.ecommercebe.common.utils.CookieUtil;
 import com.nr.ecommercebe.module.user.api.*;
+import com.nr.ecommercebe.module.user.api.request.LoginRequestDto;
+import com.nr.ecommercebe.module.user.api.request.RegisterRequestDto;
+import com.nr.ecommercebe.module.user.api.response.LoginResponseDto;
+import com.nr.ecommercebe.module.user.api.response.RegisterResponseDto;
+import com.nr.ecommercebe.module.user.api.response.UserResponseDto;
 import com.nr.ecommercebe.module.user.service.JwtService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -49,7 +54,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<UserResponseDto> login(@RequestBody @Valid LoginRequestDto loginRequestDto,
-                                                  HttpServletResponse response) {
+                                                 HttpServletResponse response) {
         LoginResponseDto loginResponse = authService.login(loginRequestDto);
 
 

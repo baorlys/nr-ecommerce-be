@@ -1,8 +1,11 @@
 package com.nr.ecommercebe.module.user.api;
 
+import com.nr.ecommercebe.module.user.api.request.RegisterRequestDto;
+import com.nr.ecommercebe.module.user.api.response.UserResponseDto;
 import com.nr.ecommercebe.module.user.model.User;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
+
 
 @Component
 public class UserMapper {
@@ -11,18 +14,15 @@ public class UserMapper {
 
     public UserMapper(ModelMapper modelMapper) {
         this.modelMapper = modelMapper;
-//        this.configureMappings();
     }
 
-//    private void configureMappings() {
-//        modelMapper.typeMap(User.class, UserResponseDto.class)
-//                .addMappings(mapper ->
-//                        mapper.map(src -> src.getFirstName() + " " + src.getLastName(),
-//                                UserResponseDto::setFullName));
-//    }
 
     public UserResponseDto toDTO(User user) {
-        return modelMapper.map(user, UserResponseDto.class);
+        UserResponseDto dto = modelMapper.map(user, UserResponseDto.class);
+        String firstName = user.getFirstName() != null ? user.getFirstName() : "";
+        String lastName = user.getLastName() != null ? user.getLastName() : "";
+        dto.setFullName((firstName + " " + lastName).trim());
+        return dto;
     }
 
     public User toEntity(RegisterRequestDto userDTO) {

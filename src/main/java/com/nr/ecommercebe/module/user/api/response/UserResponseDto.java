@@ -1,4 +1,4 @@
-package com.nr.ecommercebe.module.user.api;
+package com.nr.ecommercebe.module.user.api.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,5 +10,6 @@ import lombok.NoArgsConstructor;
 public class UserResponseDto {
     String id;
     String email;
+    String fullName;
 }
 

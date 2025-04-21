@@ -1,4 +1,4 @@
-package com.nr.ecommercebe.module.user.api;
+package com.nr.ecommercebe.module.user.api.response;
 
 import com.nr.ecommercebe.module.user.model.TokenType;
 import lombok.Builder;
