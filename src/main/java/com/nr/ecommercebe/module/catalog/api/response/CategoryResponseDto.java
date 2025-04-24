@@ -11,6 +11,8 @@ import lombok.experimental.FieldDefaults;
 public class CategoryResponseDto {
     String id;
     String name;
+    String slug;
+    String description;
     String imageUrl;
-    String parentId;
+    CategoryResponseDto[] subCategories;
 }
