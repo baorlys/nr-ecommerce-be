@@ -10,24 +10,24 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
-public class CategoryRequestDto {
-    @NotBlank(message = "Category name is required")
-    String name;
-
-    String description;
-
-    @NotBlank(message = "Category image is required")
+public class ProductImageRequestDto {
+    @NotBlank(message = "Image url is required")
     String imageUrl;
+
+    String altText;
 
     @ValidEnum(enumClass = StorageType.class, message = "Invalid storage type")
     @NotNull(message = "Storage type is required")
     StorageType storageType;
 
-    String parentId;
+    Boolean isPrimary;
+
+    Integer sortOrder;
 
 }

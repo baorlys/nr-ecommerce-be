@@ -1,5 +1,6 @@
 package com.nr.ecommercebe.module.catalog.service;
 
+import com.nr.ecommercebe.module.catalog.api.ProductMapper;
 import com.nr.ecommercebe.module.catalog.api.ProductService;
 import com.nr.ecommercebe.module.catalog.api.request.ProductFilter;
 import com.nr.ecommercebe.module.catalog.api.request.ProductRequestDto;
@@ -16,7 +17,6 @@ import com.nr.ecommercebe.common.exception.RecordNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -34,26 +34,36 @@ public class ProductServiceImpl implements ProductService {
     ProductVariantRepository productVariantRepository;
     ProductImageRepository productImageRepository;
 
-    ModelMapper mapper;
+    ProductMapper mapper;
 
     @Override
     public ProductDetailResponseDto create(ProductRequestDto request) {
-        Product createdProduct = productRepository.save(mapper.map(request, Product.class));
-        return mapper.map(createdProduct, ProductDetailResponseDto.class);
+        Product product = mapper.toEntity(request);
+
+        product.setProductImages(mapper.mapImages(request.getProductImages(), product));
+        product.setProductVariants(mapper.mapVariants(request.getProductVariants(), product));
+
+        Product createdProduct = productRepository.save(product);
+        return mapper.toDto(createdProduct);
     }
 
+
+    // Fixme: Fix this method
     @Override
     public ProductDetailResponseDto update(String id, ProductRequestDto request) {
-        Product product = productRepository.findById(id)
+        productRepository.findById(id)
                 .orElseThrow(() -> {
                     log.error(ErrorCode.PRODUCT_NOT_FOUND.getDefaultMessage(id));
                     return new RecordNotFoundException(ErrorCode.PRODUCT_NOT_FOUND.getMessage());
                 });
-        mapper.map(request, product);
-        product.setId(id);
-        Product updatedProduct = productRepository.save(product);
-        return mapper.map(updatedProduct, ProductDetailResponseDto.class);
+
+        Product updatedProduct = mapper.toEntity(request);
+        updatedProduct.setId(id);
+        Product saved = productRepository.save(updatedProduct);
+        return mapper.toDto(saved);
     }
+
+
 
     @Override
     public void delete(String id) {
@@ -78,11 +88,6 @@ public class ProductServiceImpl implements ProductService {
     @Transactional(readOnly = true)
     @Override
     public Page<ProductResponseDto> getAll(ProductFilter filter, Pageable pageable) {
-//         Option use Specification
-//         return productRepository.findBy(ProductSpecs.buildFilter(filter),
-//         query -> query.as(ProductResponseDto.class).page(pageable));
-
-//         Option use custom repository
         return productRepository.findAllAndFilterWithDto(filter, pageable);
     }
 

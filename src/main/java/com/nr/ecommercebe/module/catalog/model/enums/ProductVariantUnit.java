@@ -9,6 +9,7 @@ public enum ProductVariantUnit {
     L("l"),
     ML("ml");
 
+
     private final String unit;
 
     ProductVariantUnit(String unit) {
