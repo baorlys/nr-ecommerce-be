@@ -3,6 +3,8 @@ package com.nr.ecommercebe.module.catalog.api.response;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -14,5 +16,5 @@ public class CategoryResponseDto {
     String slug;
     String description;
     String imageUrl;
-    CategoryResponseDto[] subCategories;
+    List<CategoryResponseDto> subCategories;
 }
