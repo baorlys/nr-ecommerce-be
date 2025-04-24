@@ -16,7 +16,11 @@ import java.util.Set;
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Category extends BaseEntity {
+    @Column(unique = true, nullable = false)
     String name;
+
+    @Column(unique = true, nullable = false)
+    String slug;
 
     @ToString.Exclude
     String description;
@@ -25,6 +29,9 @@ public class Category extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     Category parent;
+
+    @OneToMany(mappedBy = "parent", fetch = FetchType.LAZY)
+    private Set<Category> subCategories;
 
     @OneToMany(mappedBy = "category", fetch = FetchType.LAZY)
     @ToString.Exclude

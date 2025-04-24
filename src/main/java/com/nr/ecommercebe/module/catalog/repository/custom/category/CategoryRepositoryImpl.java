@@ -4,12 +4,10 @@ import com.nr.ecommercebe.module.catalog.api.response.CategoryResponseDto;
 import com.nr.ecommercebe.module.catalog.model.Category;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import jakarta.persistence.TypedQuery;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.*;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,49 +18,58 @@ public class CategoryRepositoryImpl implements CategoryRepositoryCustom {
     @Override
     public List<CategoryResponseDto> findAllWithDto() {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-
-        CriteriaQuery<CategoryResponseDto> query = cb.createQuery(CategoryResponseDto.class);
+        CriteriaQuery<Category> query = cb.createQuery(Category.class);
         Root<Category> root = query.from(Category.class);
 
-        query
-                .select(
-                        cb.construct(
-                                CategoryResponseDto.class,
-                                root.get("id"),
-                                root.get("name"),
-                                root.get("imageUrl"),
-                                root.get("parent").get("id")
-                        )
-                );
+        query.select(root).where(cb.isNull(root.get("parent")));
 
-        TypedQuery<CategoryResponseDto> typedQuery = entityManager.createQuery(query);
-        return typedQuery.getResultList();
+        List<Category> topCategories = entityManager.createQuery(query).getResultList();
+
+        return topCategories.stream()
+                .map(this::mapCategoryWithChildren)
+                .toList();
+    }
+
+    private CategoryResponseDto mapCategoryWithChildren(Category category) {
+        CategoryResponseDto[] subCategoriesDto = category.getSubCategories().stream()
+                .map(this::mapCategory)
+                .toArray(CategoryResponseDto[]::new);
+
+        return new CategoryResponseDto(
+                category.getId(),
+                category.getName(),
+                category.getSlug(),
+                category.getDescription(),
+                category.getImageUrl(),
+                new ArrayList<>(List.of(subCategoriesDto))// No deeper nesting
+        );
+    }
+
+    private CategoryResponseDto mapCategory(Category category) {
+        return new CategoryResponseDto(
+                category.getId(),
+                category.getName(),
+                category.getSlug(),
+                category.getDescription(),
+                category.getImageUrl(),
+                new ArrayList<>()// No deeper nesting
+        );
     }
 
     @Override
     public Optional<CategoryResponseDto> findByIdWithDto(String id) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-
-        CriteriaQuery<CategoryResponseDto> query = cb.createQuery(CategoryResponseDto.class);
+        CriteriaQuery<Category> query = cb.createQuery(Category.class);
         Root<Category> root = query.from(Category.class);
 
-        query
-                .select(
-                        cb.construct(
-                            CategoryResponseDto.class,
-                            root.get("id"),
-                            root.get("name"),
-                            root.get("imageUrl"),
-                            root.get("parent").get("id")
-                        )
-                )
-                .where(
-                        cb.equal(root.get("id"), id)
-                );
+        query.select(root).where(cb.equal(root.get("id"), id));
 
-        TypedQuery<CategoryResponseDto> typedQuery = entityManager.createQuery(query);
-        List<CategoryResponseDto> resultList = typedQuery.getResultList();
+        Category category = entityManager.createQuery(query).getResultStream().findFirst().orElse(null);
 
-        return Optional.ofNullable(resultList.getFirst());
+        if (category == null) {
+            return Optional.empty();
+        }
+
+        return Optional.of(mapCategoryWithChildren(category));
     }
 }

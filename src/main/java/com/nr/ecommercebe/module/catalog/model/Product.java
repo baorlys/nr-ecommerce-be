@@ -20,7 +20,14 @@ public class Product extends BaseEntity {
     @Column(unique = true, nullable = false)
     String name;
 
+    @Column(unique = true, nullable = false)
+    String slug;
+
+    @Lob
+    @Column(columnDefinition = "TEXT")
     String description;
+
+    String shortDescription;
 
     @ManyToOne(fetch = FetchType.LAZY)
     Category category;

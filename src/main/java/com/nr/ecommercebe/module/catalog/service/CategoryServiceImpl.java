@@ -62,6 +62,24 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional(readOnly = true)
     @Override
     public List<CategoryResponseDto> getAll() {
-        return categoryRepository.findAllWithDto();
+        List<Category> categories = categoryRepository.findAll();
+
+        return categories.stream()
+                .filter(category -> category.getParent() == null)
+                .map(this::mapCategoryWithChildren)
+                .toList();
     }
+
+    private CategoryResponseDto mapCategoryWithChildren(Category category) {
+        CategoryResponseDto dto = mapper.map(category, CategoryResponseDto.class);
+
+        List<CategoryResponseDto> subCategoriesDto = category.getSubCategories().stream()
+                .map(this::mapCategoryWithChildren)
+                .toList();
+
+        dto.setSubCategories(subCategoriesDto);
+        return dto;
+    }
+
+
 }
