@@ -1,4 +1,4 @@
-package com.nr.ecommercebe.web.customer;
+package com.nr.ecommercebe.web;
 
 import com.nr.ecommercebe.module.catalog.api.response.CategoryResponseDto;
 import com.nr.ecommercebe.module.catalog.api.CategoryService;

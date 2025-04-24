@@ -35,3 +35,4 @@ build/
 *.pem
 secret.properties
 .env
+*.pem

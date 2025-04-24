@@ -31,7 +31,7 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     String passwordHash;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(nullable = false)
     Role role;
 }

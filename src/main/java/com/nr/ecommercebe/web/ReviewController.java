@@ -1,4 +1,4 @@
-package com.nr.ecommercebe.web.customer;
+package com.nr.ecommercebe.web;
 
 import com.nr.ecommercebe.common.model.PagedResponseSuccess;
 import com.nr.ecommercebe.module.review.api.ReviewFilter;

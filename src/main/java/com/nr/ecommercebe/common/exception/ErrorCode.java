@@ -10,7 +10,20 @@ public enum ErrorCode {
     CATEGORY_NOT_FOUND("category.not.found","Category not found" ,
             "Category with ID%s not found" ),
     REVIEW_NOT_FOUND("review.not.found", "Review not found" ,
-            "Review with ID%s not found" );
+            "Review with ID%s not found" ),
+    EMAIL_EXISTS("email.exists", "Email already exists",
+            "Email %s already exists"),
+    PHONE_EXISTS("phone.exists", "Phone already exists",
+            "Phone %s already exists"),
+    USER_EMAIL_NOT_FOUND("user.email.not.found", "User not found",
+            "User with email %s not found"),
+    INVALID_CREDENTIAL("invalid.user.password", "Invalid email or password",
+            "Invalid email or password"),
+    JWT_IS_INVALID("jwt.is_invalid", "JWT is invalid",
+            "JWT is invalid"),
+    UNAUTHORIZED("unauthorized", "Access denied. Invalid or missing token.",
+            "Unauthorized access");
+
 
 
     private final String code;
