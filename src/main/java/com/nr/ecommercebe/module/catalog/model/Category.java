@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.util.List;
 import java.util.Set;
 
 @Entity(name = "categories")
@@ -28,10 +29,12 @@ public class Category extends BaseEntity {
     String imageUrl;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @ToString.Exclude
     Category parent;
 
     @OneToMany(mappedBy = "parent", fetch = FetchType.LAZY)
-    private Set<Category> subCategories;
+    @ToString.Exclude
+    List<Category> subCategories;
 
     @OneToMany(mappedBy = "category", fetch = FetchType.LAZY)
     @ToString.Exclude

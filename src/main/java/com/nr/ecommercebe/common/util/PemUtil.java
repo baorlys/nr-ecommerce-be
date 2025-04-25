@@ -1,4 +1,4 @@
-package com.nr.ecommercebe.common.utils;
+package com.nr.ecommercebe.common.util;
 
 import org.springframework.core.io.Resource;
 

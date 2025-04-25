@@ -1,6 +1,6 @@
 package com.nr.ecommercebe.common.config;
 
-import com.nr.ecommercebe.common.utils.CookieUtil;
+import com.nr.ecommercebe.common.util.CookieUtil;
 import com.nr.ecommercebe.module.user.service.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

@@ -1,5 +1,7 @@
 package com.nr.ecommercebe.module.catalog.service;
 
+import com.nr.ecommercebe.common.util.SlugUtil;
+import com.nr.ecommercebe.module.catalog.api.CategoryMapper;
 import com.nr.ecommercebe.module.catalog.api.CategoryService;
 import com.nr.ecommercebe.module.catalog.api.request.CategoryRequestDto;
 import com.nr.ecommercebe.module.catalog.api.response.CategoryResponseDto;
@@ -15,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -23,12 +26,18 @@ import java.util.List;
 @FieldDefaults(makeFinal = true, level = lombok.AccessLevel.PRIVATE)
 public class CategoryServiceImpl implements CategoryService {
     CategoryRepository categoryRepository;
-    ModelMapper mapper;
+    CategoryMapper mapper;
 
     @Override
     public CategoryResponseDto create(CategoryRequestDto request) {
-        Category category = categoryRepository.save(mapper.map(request, Category.class));
-        return mapper.map(category, CategoryResponseDto.class);
+        if (categoryRepository.existsByName((request.getName()))) {
+            throw new RecordNotFoundException(ErrorCode.CATEGORY_NAME_ALREADY_EXISTS.getMessage());
+        }
+        Category category = mapper.toEntity(request);
+        category.setSlug(SlugUtil.generateSlug(category.getName()));
+
+        Category savedCategory = categoryRepository.save(category);
+        return mapper.toResponseDto(savedCategory);
     }
 
     @Override
@@ -38,10 +47,19 @@ public class CategoryServiceImpl implements CategoryService {
                     log.error(ErrorCode.CATEGORY_NOT_FOUND.getDefaultMessage(id));
                     return new RecordNotFoundException(ErrorCode.CATEGORY_NOT_FOUND.getMessage());
                 });
-        mapper.map(request, category);
-        category.setId(id);
+        if (categoryRepository.existsByName(request.getName())) {
+            throw new RecordNotFoundException(ErrorCode.CATEGORY_NAME_ALREADY_EXISTS.getMessage());
+        }
+
+        category.setName(request.getName());
+        category.setDescription(request.getDescription());
+        category.setSlug(SlugUtil.generateSlug(request.getName()));
+        category.setParent(request.getParentId() != null ? categoryRepository.findById(request.getParentId()).orElse(null) : null);
+
         Category updatedCategory = categoryRepository.save(category);
-        return mapper.map(updatedCategory, CategoryResponseDto.class);
+
+        return mapper.toResponseDto(updatedCategory);
+
     }
 
     @Override
@@ -62,24 +80,12 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional(readOnly = true)
     @Override
     public List<CategoryResponseDto> getAll() {
-        List<Category> categories = categoryRepository.findAll();
+        List<Category> categories = categoryRepository.findAllByParentIsNull();
 
         return categories.stream()
-                .filter(category -> category.getParent() == null)
-                .map(this::mapCategoryWithChildren)
-                .toList();
-    }
-
-    private CategoryResponseDto mapCategoryWithChildren(Category category) {
-        CategoryResponseDto dto = mapper.map(category, CategoryResponseDto.class);
-
-        List<CategoryResponseDto> subCategoriesDto = category.getSubCategories().stream()
-                .map(this::mapCategoryWithChildren)
+                .map(mapper::mapCategoryWithChildren)
                 .toList();
 
-        dto.setSubCategories(subCategoriesDto);
-        return dto;
     }
-
 
 }
