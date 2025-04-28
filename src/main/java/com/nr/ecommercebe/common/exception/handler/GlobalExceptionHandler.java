@@ -1,5 +1,6 @@
 package com.nr.ecommercebe.common.exception.handler;
 
+import com.nr.ecommercebe.common.exception.ErrorCode;
 import com.nr.ecommercebe.common.exception.ErrorResponse;
 import com.nr.ecommercebe.common.exception.RecordExists;
 import com.nr.ecommercebe.common.exception.RecordNotFoundException;
@@ -49,8 +50,22 @@ public class GlobalExceptionHandler {
                 .body(errorResponse);
     }
 
-    @ExceptionHandler({BadCredentialsException.class, JwtException.class})
-    public ResponseEntity<ErrorResponse> handleBadCredentialsException(BadCredentialsException ex, HttpServletRequest request) {
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ErrorResponse> handleBadCredentialsException(HttpServletRequest request) {
+        ErrorResponse errorResponse = new ErrorResponse(
+                LocalDateTime.now(),
+                HttpStatus.UNAUTHORIZED.value(),
+                ErrorCode.INVALID_CREDENTIAL.getMessage(),
+                request.getRequestURI()
+        );
+
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .body(errorResponse);
+    }
+
+    @ExceptionHandler(JwtException.class)
+    public ResponseEntity<ErrorResponse> handleJwtException(JwtException ex, HttpServletRequest request) {
         ErrorResponse errorResponse = new ErrorResponse(
                 LocalDateTime.now(),
                 HttpStatus.UNAUTHORIZED.value(),

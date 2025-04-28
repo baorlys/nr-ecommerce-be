@@ -5,9 +5,6 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
-import org.hibernate.annotations.Filter;
-import org.hibernate.annotations.FilterDef;
-import org.hibernate.annotations.ParamDef;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -18,8 +15,6 @@ import java.util.Objects;
 @MappedSuperclass
 @Data
 @EntityListeners(AuditingEntityListener.class)
-@FilterDef(name = "softDeleteFilter", parameters = @ParamDef(name = "isDeleted", type = boolean.class)) // Define filter for soft delete
-@Filter(name = "softDeleteFilter", condition = "is_deleted = :isDeleted") // Filter condition for soft delete
 @FieldDefaults(level = AccessLevel.PROTECTED)
 public class BaseEntity {
     @Id
@@ -31,22 +26,16 @@ public class BaseEntity {
     LocalDate createdOn;
 
     @LastModifiedDate
-    LocalDate updateOn;
+    LocalDate updatedOn;
 
     @Column(columnDefinition = "boolean default false")
-    boolean isDeleted;
+    boolean deleted;
 
     @PrePersist
     protected void initUlid() {
         if (this.id == null) {
             this.id = UlidCreator.getUlid().toString();
         }
-    }
-
-
-    @PreRemove
-    public void onPreRemove() {
-        this.isDeleted = true; // Perform soft delete by setting isDeleted to true
     }
 
     @Override

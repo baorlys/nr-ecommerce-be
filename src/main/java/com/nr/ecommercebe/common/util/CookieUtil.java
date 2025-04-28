@@ -1,4 +1,4 @@
-package com.nr.ecommercebe.common.utils;
+package com.nr.ecommercebe.common.util;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;

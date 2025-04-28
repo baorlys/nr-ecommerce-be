@@ -6,6 +6,7 @@ import com.nr.ecommercebe.module.user.api.*;
 import com.nr.ecommercebe.module.user.api.request.LoginRequestDto;
 import com.nr.ecommercebe.module.user.api.request.RegisterRequestDto;
 import com.nr.ecommercebe.module.user.api.response.LoginResponseDto;
+import com.nr.ecommercebe.module.user.api.response.UserResponseDto;
 import com.nr.ecommercebe.module.user.initializer.RoleCache;
 import com.nr.ecommercebe.module.user.model.Role;
 import com.nr.ecommercebe.module.user.model.RoleName;
@@ -47,11 +48,14 @@ public class AuthServiceImpl implements AuthService {
         String accessToken = jwtService.generateAccessToken(userDetails);
         String refreshToken = jwtService.generateRefreshToken(userDetails);
 
+        UserResponseDto userResponse = mapper.toDTO(userDetails.user());
+        userResponse.setRole(userDetails.getRole());
+
         return LoginResponseDto.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .tokenType(TokenType.BEARER)
-                .user(mapper.toDTO(userDetails.user()))
+                .user(userResponse)
                 .build();
     }
 
@@ -87,5 +91,24 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public void logout(String token) {
         // Implement blacklist token logic
+    }
+
+    @Override
+    public UserResponseDto getCurrentUser(String accessToken) {
+        if(!jwtService.isTokenValid(accessToken)) {
+            throw new JwtException(ErrorCode.JWT_IS_INVALID.getMessage());
+        }
+
+        String userId = jwtService.getUsername(accessToken);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new JwtException(ErrorCode.USER_NOT_FOUND.getMessage()));
+
+        UserResponseDto userResponse = mapper.toDTO(user);
+
+        String roleName = jwtService.getRole(accessToken).replace("ROLE_", "");
+        userResponse.setRole(RoleName.valueOf(roleName));
+
+        return userResponse;
+
     }
 }

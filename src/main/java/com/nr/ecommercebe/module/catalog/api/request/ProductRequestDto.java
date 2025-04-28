@@ -19,6 +19,7 @@ public class ProductRequestDto {
     @NotBlank(message = "Product name is required")
     String name;
     String description;
+    String shortDescription;
     @NotBlank(message = "Product category is required")
     String categoryId;
     @NotNull
