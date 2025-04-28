@@ -1,4 +1,4 @@
-package com.nr.ecommercebe.module.integration.media;
+package com.nr.ecommercebe.module.media.cloudinary;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;

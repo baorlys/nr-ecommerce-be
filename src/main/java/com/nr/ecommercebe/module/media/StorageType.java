@@ -1,4 +1,4 @@
-package com.nr.ecommercebe.common.model;
+package com.nr.ecommercebe.module.media;
 
 public enum StorageType {
     LOCAL("local"),

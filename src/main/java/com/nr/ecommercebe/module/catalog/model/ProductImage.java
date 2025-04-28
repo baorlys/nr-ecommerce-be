@@ -1,7 +1,7 @@
 package com.nr.ecommercebe.module.catalog.model;
 
 
-import com.nr.ecommercebe.common.model.StorageType;
+import com.nr.ecommercebe.module.media.StorageType;
 import com.nr.ecommercebe.common.model.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;

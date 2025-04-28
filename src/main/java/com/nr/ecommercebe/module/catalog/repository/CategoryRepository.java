@@ -15,12 +15,13 @@ import java.util.List;
 public interface CategoryRepository extends JpaRepository<Category, String>, CategoryRepositoryCustom {
 
     @EntityGraph(attributePaths = "subCategories")
-
-    boolean existsByName(String name);
-
-    boolean existsByNameAndIdIsNotAndDeletedIsFalse(String name, String id);
-
     List<Category> findAllByParentIsNullAndDeletedIsFalse();
 
     Page<Category> findAllByDeletedIsFalse(Pageable pageable);
+
+    boolean existsByNameAndDeletedIsFalse(String name);
+
+    List<Category> findAllByParent(Category category);
+
+    boolean existsByNameAndIdIsNotAndDeletedIsFalse(String name, String id);
 }
