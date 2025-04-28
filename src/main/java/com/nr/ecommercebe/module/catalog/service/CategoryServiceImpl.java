@@ -1,5 +1,4 @@
 package com.nr.ecommercebe.module.catalog.service;
-
 import com.nr.ecommercebe.common.util.SlugUtil;
 import com.nr.ecommercebe.module.catalog.api.CategoryMapper;
 import com.nr.ecommercebe.module.catalog.api.CategoryService;
@@ -7,9 +6,11 @@ import com.nr.ecommercebe.module.catalog.api.request.CategoryRequestDto;
 import com.nr.ecommercebe.module.catalog.api.response.AdminCategoryFlatResponseDto;
 import com.nr.ecommercebe.module.catalog.api.response.CategoryResponseDto;
 import com.nr.ecommercebe.module.catalog.model.Category;
+import com.nr.ecommercebe.module.catalog.model.Product;
 import com.nr.ecommercebe.module.catalog.repository.CategoryRepository;
 import com.nr.ecommercebe.common.exception.ErrorCode;
 import com.nr.ecommercebe.common.exception.RecordNotFoundException;
+import com.nr.ecommercebe.module.catalog.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
@@ -28,11 +29,12 @@ import java.util.List;
 @FieldDefaults(makeFinal = true, level = lombok.AccessLevel.PRIVATE)
 public class CategoryServiceImpl implements CategoryService {
     CategoryRepository categoryRepository;
+    ProductRepository productRepository;
     CategoryMapper mapper;
 
     @Override
     public CategoryResponseDto create(CategoryRequestDto request) {
-        if (categoryRepository.existsByName((request.getName()))) {
+        if (categoryRepository.existsByNameAndDeletedIsFalse((request.getName()))) {
             throw new RecordNotFoundException(ErrorCode.CATEGORY_NAME_ALREADY_EXISTS.getMessage());
         }
         Category category = mapper.toEntity(request);
@@ -49,14 +51,15 @@ public class CategoryServiceImpl implements CategoryService {
                     log.error(ErrorCode.CATEGORY_NOT_FOUND.getDefaultMessage(id));
                     return new RecordNotFoundException(ErrorCode.CATEGORY_NOT_FOUND.getMessage());
                 });
-        if (categoryRepository.existsByNameAndIdIsNotAndDeletedIsFalse((request.getName()), id)) {
+        if (categoryRepository.existsByNameAndIdIsNotAndDeletedIsFalse(request.getName(), id)) {
             throw new RecordNotFoundException(ErrorCode.CATEGORY_NAME_ALREADY_EXISTS.getMessage());
         }
 
         category.setName(request.getName());
         category.setDescription(request.getDescription());
         category.setSlug(SlugUtil.generateSlug(request.getName()));
-        category.setParent(request.getParentId() != null ? categoryRepository.findById(request.getParentId()).orElse(null) : null);
+        category.setParent(request.getParentId() != null ? categoryRepository.findById(request.getParentId())
+                .orElseThrow(() -> new RecordNotFoundException(ErrorCode.CATEGORY_NOT_FOUND.getMessage())) : null);
 
         Category updatedCategory = categoryRepository.save(category);
 
@@ -71,8 +74,20 @@ public class CategoryServiceImpl implements CategoryService {
                     log.error(ErrorCode.CATEGORY_NOT_FOUND.getDefaultMessage(id));
                     return new RecordNotFoundException(ErrorCode.CATEGORY_NOT_FOUND.getMessage());
                 });
-        category.setDeleted(true);
-        categoryRepository.save(category);
+
+        List<Product> products = productRepository.findAllByCategory(category);
+        products.forEach(product -> {
+            product.setCategory(null);
+            productRepository.save(product);
+        });
+
+        List<Category> subCategories = categoryRepository.findAllByParent(category);
+        subCategories.forEach( childCategory -> {
+            childCategory.setParent(null);
+            categoryRepository.save(childCategory);
+        });
+
+        categoryRepository.delete(category);
     }
 
     @Transactional(readOnly = true)

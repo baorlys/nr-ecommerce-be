@@ -1,7 +1,8 @@
-package com.nr.ecommercebe.module.integration.media;
+package com.nr.ecommercebe.module.media.cloudinary;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
+import com.nr.ecommercebe.module.media.MediaService;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -14,21 +15,15 @@ import java.util.Map;
 @Service
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class CloudinaryService {
+public class CloudinaryService implements MediaService {
     Cloudinary cloudinary;
 
-    public Map uploadFile(MultipartFile file, String folderName) throws IOException {
-        return cloudinary.uploader().upload(file.getBytes(),
+    @Override
+    public String uploadImage(MultipartFile file, String folderName) throws IOException {
+         Map data = cloudinary.uploader().upload(file.getBytes(),
                 ObjectUtils.asMap(
                         "folder", folderName
                 ));
-    }
-
-    public Map uploadVideo(MultipartFile file, String folderName) throws IOException {
-        return cloudinary.uploader().upload(file.getBytes(),
-                ObjectUtils.asMap(
-                        "resource_type", "video",
-                        "folder", folderName
-                ));
+        return (String) data.get("url");
     }
 }

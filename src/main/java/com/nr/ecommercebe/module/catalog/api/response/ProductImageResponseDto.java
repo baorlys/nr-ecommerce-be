@@ -1,6 +1,6 @@
 package com.nr.ecommercebe.module.catalog.api.response;
 
-import com.nr.ecommercebe.common.model.StorageType;
+import com.nr.ecommercebe.module.media.StorageType;
 
 public record ProductImageResponseDto(
         String id,
