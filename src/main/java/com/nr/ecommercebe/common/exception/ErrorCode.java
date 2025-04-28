@@ -11,6 +11,8 @@ public enum ErrorCode {
             "Category with ID%s not found" ),
     REVIEW_NOT_FOUND("review.not.found", "Review not found" ,
             "Review with ID%s not found" ),
+    USER_NOT_FOUND("user.not.found", "User not found",
+            "User with ID%s not found" ),
     CATEGORY_NAME_ALREADY_EXISTS("category.name.already.exists", "Category name already exists",
             "Category name %s already exists"),
     PRODUCT_NAME_ALREADY_EXISTS("product.name.already.exists", "Product name already exists",

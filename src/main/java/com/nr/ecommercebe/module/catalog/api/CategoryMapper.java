@@ -1,6 +1,7 @@
 package com.nr.ecommercebe.module.catalog.api;
 
 import com.nr.ecommercebe.module.catalog.api.request.CategoryRequestDto;
+import com.nr.ecommercebe.module.catalog.api.response.AdminCategoryFlatResponseDto;
 import com.nr.ecommercebe.module.catalog.api.response.CategoryResponseDto;
 import com.nr.ecommercebe.module.catalog.model.Category;
 import lombok.RequiredArgsConstructor;
@@ -39,5 +40,13 @@ public class CategoryMapper {
             category.setParent(parent);
         }
         return category;
+    }
+
+    public AdminCategoryFlatResponseDto toAdminCategoryFlatResponseDto(Category category) {
+        AdminCategoryFlatResponseDto dto = mapper.map(category, AdminCategoryFlatResponseDto.class);
+        if (category.getParent() != null) {
+            dto.setParentId(category.getParent().getId());
+        }
+        return dto;
     }
 }
