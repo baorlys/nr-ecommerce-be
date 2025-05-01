@@ -1,6 +1,6 @@
 package com.nr.ecommercebe.web;
 
-import com.nr.ecommercebe.common.util.CookieUtil;
+import com.nr.ecommercebe.shared.util.CookieUtil;
 import com.nr.ecommercebe.module.user.api.*;
 import com.nr.ecommercebe.module.user.api.request.LoginRequestDto;
 import com.nr.ecommercebe.module.user.api.request.RegisterRequestDto;

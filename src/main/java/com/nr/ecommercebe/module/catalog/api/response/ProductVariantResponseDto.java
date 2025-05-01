@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 
 public record ProductVariantResponseDto(
         String id,
+        String name,
         BigDecimal weight,
         ProductVariantUnit unit,
         BigDecimal price,

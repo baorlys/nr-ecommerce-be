@@ -17,6 +17,9 @@ import java.math.BigDecimal;
 @Builder
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
 public class ProductVariantRequestDto {
+    @NotNull(message = "Variant name is required")
+    String name;
+
     @NotNull(message = "Weight is required")
     BigDecimal weight;
 

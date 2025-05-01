@@ -1,19 +1,21 @@
 package com.nr.ecommercebe.module.catalog.service;
 
-import com.nr.ecommercebe.module.catalog.api.ProductMapper;
+import com.nr.ecommercebe.module.catalog.api.mapper.ProductMapper;
 import com.nr.ecommercebe.module.catalog.api.ProductService;
 import com.nr.ecommercebe.module.catalog.api.request.ProductFilter;
 import com.nr.ecommercebe.module.catalog.api.request.ProductRequestDto;
-import com.nr.ecommercebe.module.catalog.api.response.ProductDetailResponseDto;
-import com.nr.ecommercebe.module.catalog.api.response.ProductResponseDto;
-import com.nr.ecommercebe.module.catalog.api.response.ProductImageResponseDto;
-import com.nr.ecommercebe.module.catalog.api.response.ProductVariantResponseDto;
+import com.nr.ecommercebe.module.catalog.api.request.ProductImageRequestDto;
+import com.nr.ecommercebe.module.catalog.api.request.ProductVariantRequestDto;
+import com.nr.ecommercebe.module.catalog.api.response.*;
 import com.nr.ecommercebe.module.catalog.model.Product;
+import com.nr.ecommercebe.module.catalog.model.ProductImage;
+import com.nr.ecommercebe.module.catalog.model.ProductVariant;
 import com.nr.ecommercebe.module.catalog.repository.ProductImageRepository;
 import com.nr.ecommercebe.module.catalog.repository.ProductRepository;
 import com.nr.ecommercebe.module.catalog.repository.ProductVariantRepository;
-import com.nr.ecommercebe.common.exception.ErrorCode;
-import com.nr.ecommercebe.common.exception.RecordNotFoundException;
+import com.nr.ecommercebe.module.messaging.ImageDeletePublisher;
+import com.nr.ecommercebe.shared.exception.ErrorCode;
+import com.nr.ecommercebe.shared.exception.RecordNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +35,7 @@ public class ProductServiceImpl implements ProductService {
     ProductRepository productRepository;
     ProductVariantRepository productVariantRepository;
     ProductImageRepository productImageRepository;
+    ImageDeletePublisher imageDeletePublisher;
 
     ProductMapper mapper;
 
@@ -48,7 +51,6 @@ public class ProductServiceImpl implements ProductService {
     }
 
 
-    // Fixme: Fix this method
     @Override
     public ProductDetailResponseDto update(String id, ProductRequestDto request) {
         productRepository.findById(id)
@@ -78,10 +80,11 @@ public class ProductServiceImpl implements ProductService {
     public ProductDetailResponseDto getById(String id) {
         ProductDetailResponseDto prodDto = productRepository.findByIdWithDto(id)
                 .orElseThrow(() -> new RecordNotFoundException(ErrorCode.PRODUCT_NOT_FOUND.getMessage()));
-        List<ProductVariantResponseDto> productVariants = productVariantRepository.findByProductId(prodDto.getId());
-        List<ProductImageResponseDto> productImages = productImageRepository.findByProductId(prodDto.getId());
-        prodDto.setProductVariants(productVariants);
-        prodDto.setProductImages(productImages);
+
+        List<ProductVariantResponseDto> productVariants = productVariantRepository.findByProductId(id);
+        List<ProductImageResponseDto> productImages = productImageRepository.findByProductId(id);
+        prodDto.setVariants(productVariants);
+        prodDto.setImages(productImages);
         return prodDto;
     }
 
@@ -89,6 +92,88 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public Page<ProductResponseDto> getAll(ProductFilter filter, Pageable pageable) {
         return productRepository.findAllAndFilterWithDto(filter, pageable);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public Page<AdminProductResponseDto> getAllForAdmin(ProductFilter filter, Pageable pageable) {
+        return productRepository.findAllAndFilterForAdminWithDto(filter, pageable);
+    }
+
+    @Override
+    public void addVariant(String id, ProductVariantRequestDto request) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> {
+                    log.error(ErrorCode.PRODUCT_NOT_FOUND.getDefaultMessage(id));
+                    return new RecordNotFoundException(ErrorCode.PRODUCT_NOT_FOUND.getMessage());
+                });
+
+        ProductVariant variant = mapper.toVariantEntity(request);
+        variant.setProduct(product);
+        productVariantRepository.save(variant);
+    }
+
+    @Override
+    public void updateVariant(String variantId, ProductVariantRequestDto request) {
+        ProductVariant variant = productVariantRepository.findById(variantId)
+                .orElseThrow(() -> {
+                    log.error(ErrorCode.PRODUCT_VARIANT_NOT_FOUND.getDefaultMessage(variantId));
+                    return new RecordNotFoundException(ErrorCode.PRODUCT_VARIANT_NOT_FOUND.getMessage());
+                });
+
+        ProductVariant updatedVariant = mapper.toVariantEntity(request);
+        updatedVariant.setId(variantId);
+        updatedVariant.setProduct(variant.getProduct());
+
+        productVariantRepository.save(updatedVariant);
+    }
+
+    @Override
+    public void deleteVariant(String variantId) {
+        ProductVariant variant = productVariantRepository.findById(variantId)
+                .orElseThrow(() -> {
+                    log.error(ErrorCode.PRODUCT_VARIANT_NOT_FOUND.getDefaultMessage(variantId));
+                    return new RecordNotFoundException(ErrorCode.PRODUCT_VARIANT_NOT_FOUND.getMessage());
+                });
+
+        if (variant.getProduct().getProductVariants().size() <= 1) {
+            throw new IllegalStateException("Cannot delete the last variant of a product");
+        }
+
+        variant.setDeleted(true);
+        productVariantRepository.save(variant);
+
+    }
+
+    @Override
+    public void addImage(String id, ProductImageRequestDto request) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> {
+                    log.error(ErrorCode.PRODUCT_NOT_FOUND.getDefaultMessage(id));
+                    return new RecordNotFoundException(ErrorCode.PRODUCT_NOT_FOUND.getMessage());
+                });
+
+        ProductImage image = mapper.toImageEntity(request);
+        image.setProduct(product);
+        productImageRepository.save(image);
+    }
+
+    @Override
+    public void deleteImage(String imageId) {
+        ProductImage productImage = productImageRepository.findById(imageId)
+                .orElseThrow(() -> {
+                    log.error(ErrorCode.PRODUCT_IMAGE_NOT_FOUND.getDefaultMessage(imageId));
+                    return new RecordNotFoundException(ErrorCode.PRODUCT_IMAGE_NOT_FOUND.getMessage());
+                });
+
+        if (productImage.getProduct().getProductImages().size() <= 1) {
+            throw new IllegalStateException("Cannot delete the last image of a product");
+        }
+
+        productImage.setDeleted(true);
+        productImageRepository.save(productImage);
+
+        imageDeletePublisher.publish(productImage.getImageUrl());
     }
 
 

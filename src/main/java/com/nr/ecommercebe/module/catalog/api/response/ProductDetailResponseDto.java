@@ -12,10 +12,11 @@ import java.util.List;
 public class ProductDetailResponseDto {
     String id;
     String name;
+    String shortDescription;
     String description;
     CategoryResponseDto category;
-    List<ProductVariantResponseDto> productVariants;
-    List<ProductImageResponseDto> productImages;
+    List<ProductVariantResponseDto> variants;
+    List<ProductImageResponseDto> images;
     Double averageRating;
     Long totalReviews;
 

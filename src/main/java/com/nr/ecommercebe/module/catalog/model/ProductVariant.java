@@ -1,10 +1,11 @@
 package com.nr.ecommercebe.module.catalog.model;
 
 import com.nr.ecommercebe.module.catalog.model.enums.ProductVariantUnit;
-import com.nr.ecommercebe.common.model.BaseEntity;
+import com.nr.ecommercebe.shared.model.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import lombok.experimental.SuperBuilder;
 
 import java.math.BigDecimal;
 
@@ -13,7 +14,7 @@ import java.math.BigDecimal;
 @Setter
 @ToString(exclude = {"product"})
 @EqualsAndHashCode(callSuper = true, exclude = {"product"})
-@Builder
+@SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -21,6 +22,9 @@ public class ProductVariant extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false)
     Product product;
+
+    @Column(nullable = false)
+    String name;
 
     @Column(precision = 10, scale = 2, nullable = false)
     BigDecimal weight;

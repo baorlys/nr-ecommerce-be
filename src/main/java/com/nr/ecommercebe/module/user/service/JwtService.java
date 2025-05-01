@@ -1,6 +1,6 @@
 package com.nr.ecommercebe.module.user.service;
 
-import com.nr.ecommercebe.common.util.PemUtil;
+import com.nr.ecommercebe.shared.util.PemUtil;
 import com.nr.ecommercebe.module.user.api.CustomUserDetails;
 import io.jsonwebtoken.*;
 import jakarta.annotation.PostConstruct;

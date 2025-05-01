@@ -2,7 +2,7 @@ package com.nr.ecommercebe.module.review.model;
 
 import com.nr.ecommercebe.module.catalog.model.Product;
 import com.nr.ecommercebe.module.user.model.User;
-import com.nr.ecommercebe.common.model.BaseEntity;
+import com.nr.ecommercebe.shared.model.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;

@@ -1,6 +1,6 @@
 package com.nr.ecommercebe.web;
 
-import com.nr.ecommercebe.common.model.PagedResponseSuccess;
+import com.nr.ecommercebe.shared.model.PagedResponseSuccess;
 import com.nr.ecommercebe.module.review.api.ReviewFilter;
 import com.nr.ecommercebe.module.review.api.ReviewResponseDto;
 import com.nr.ecommercebe.module.review.api.ReviewService;

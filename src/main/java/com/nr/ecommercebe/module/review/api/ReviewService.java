@@ -1,6 +1,6 @@
 package com.nr.ecommercebe.module.review.api;
 
-import com.nr.ecommercebe.common.service.BaseCrudService;
+import com.nr.ecommercebe.shared.service.BaseCrudService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

@@ -1,7 +1,7 @@
 package com.nr.ecommercebe.module.review.service;
 
-import com.nr.ecommercebe.common.exception.ErrorCode;
-import com.nr.ecommercebe.common.exception.RecordNotFoundException;
+import com.nr.ecommercebe.shared.exception.ErrorCode;
+import com.nr.ecommercebe.shared.exception.RecordNotFoundException;
 import com.nr.ecommercebe.module.review.api.ReviewFilter;
 import com.nr.ecommercebe.module.review.api.ReviewRequestDto;
 import com.nr.ecommercebe.module.review.api.ReviewResponseDto;

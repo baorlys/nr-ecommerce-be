@@ -2,7 +2,7 @@ package com.nr.ecommercebe.module.catalog.model;
 
 
 import com.nr.ecommercebe.module.review.model.Review;
-import com.nr.ecommercebe.common.model.BaseEntity;
+import com.nr.ecommercebe.shared.model.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
