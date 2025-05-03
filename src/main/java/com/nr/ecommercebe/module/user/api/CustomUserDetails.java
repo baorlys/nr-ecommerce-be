@@ -1,6 +1,6 @@
 package com.nr.ecommercebe.module.user.api;
 
-import com.nr.ecommercebe.module.user.model.RoleName;
+import com.nr.ecommercebe.module.user.model.Role;
 import com.nr.ecommercebe.module.user.model.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -25,8 +25,8 @@ public record CustomUserDetails(User user) implements UserDetails {
         return user.getId();
     }
 
-    public RoleName getRole() {
-        return user.getRole().getName();
+    public Role getRole() {
+        return user.getRole();
     }
 
 
