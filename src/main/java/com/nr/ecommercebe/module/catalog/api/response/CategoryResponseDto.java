@@ -16,5 +16,6 @@ public class CategoryResponseDto {
     String slug;
     String description;
     String imageUrl;
+    String parentId;
     List<CategoryResponseDto> subCategories;
 }

@@ -1,10 +1,10 @@
 package com.nr.ecommercebe.module.catalog.model;
 
-import com.nr.ecommercebe.module.catalog.model.enums.ProductVariantUnit;
-import com.nr.ecommercebe.common.model.BaseEntity;
+import com.nr.ecommercebe.shared.model.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import lombok.experimental.SuperBuilder;
 
 import java.math.BigDecimal;
 
@@ -13,7 +13,7 @@ import java.math.BigDecimal;
 @Setter
 @ToString(exclude = {"product"})
 @EqualsAndHashCode(callSuper = true, exclude = {"product"})
-@Builder
+@SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -22,12 +22,8 @@ public class ProductVariant extends BaseEntity {
     @JoinColumn(nullable = false)
     Product product;
 
-    @Column(precision = 10, scale = 2, nullable = false)
-    BigDecimal weight;
-
-    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    ProductVariantUnit unit;
+    String name;
 
     @Column(precision = 20, scale = 2, nullable = false)
     BigDecimal price;

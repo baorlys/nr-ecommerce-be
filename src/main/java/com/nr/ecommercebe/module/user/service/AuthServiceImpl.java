@@ -1,7 +1,7 @@
 package com.nr.ecommercebe.module.user.service;
 
-import com.nr.ecommercebe.common.exception.ErrorCode;
-import com.nr.ecommercebe.common.service.CommonExceptionService;
+import com.nr.ecommercebe.shared.exception.ErrorCode;
+import com.nr.ecommercebe.shared.service.CommonExceptionService;
 import com.nr.ecommercebe.module.user.api.*;
 import com.nr.ecommercebe.module.user.api.request.LoginRequestDto;
 import com.nr.ecommercebe.module.user.api.request.RegisterRequestDto;

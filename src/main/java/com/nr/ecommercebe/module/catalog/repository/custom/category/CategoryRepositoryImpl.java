@@ -41,6 +41,7 @@ public class CategoryRepositoryImpl implements CategoryRepositoryCustom {
                 category.getSlug(),
                 category.getDescription(),
                 category.getImageUrl(),
+                category.getParent().getId(),
                 new ArrayList<>(List.of(subCategoriesDto))// No deeper nesting
         );
     }
@@ -52,6 +53,7 @@ public class CategoryRepositoryImpl implements CategoryRepositoryCustom {
                 category.getSlug(),
                 category.getDescription(),
                 category.getImageUrl(),
+                category.getParent().getId(),
                 new ArrayList<>()// No deeper nesting
         );
     }

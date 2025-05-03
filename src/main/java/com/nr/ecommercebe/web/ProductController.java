@@ -1,7 +1,7 @@
 package com.nr.ecommercebe.web;
 
 import com.nr.ecommercebe.module.catalog.api.request.ProductFilter;
-import com.nr.ecommercebe.common.model.PagedResponseSuccess;
+import com.nr.ecommercebe.shared.model.PagedResponseSuccess;
 import com.nr.ecommercebe.module.catalog.api.response.ProductDetailResponseDto;
 import com.nr.ecommercebe.module.catalog.api.response.ProductResponseDto;
 import com.nr.ecommercebe.module.catalog.api.ProductService;

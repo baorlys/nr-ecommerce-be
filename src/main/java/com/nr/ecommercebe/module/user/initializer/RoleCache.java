@@ -1,6 +1,6 @@
 package com.nr.ecommercebe.module.user.initializer;
 
-import com.nr.ecommercebe.common.exception.RecordNotFoundException;
+import com.nr.ecommercebe.shared.exception.RecordNotFoundException;
 import com.nr.ecommercebe.module.user.model.Role;
 import com.nr.ecommercebe.module.user.model.RoleName;
 import com.nr.ecommercebe.module.user.repository.RoleRepository;

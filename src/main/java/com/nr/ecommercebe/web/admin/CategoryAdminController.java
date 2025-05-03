@@ -1,6 +1,6 @@
 package com.nr.ecommercebe.web.admin;
 
-import com.nr.ecommercebe.common.model.PagedResponseSuccess;
+import com.nr.ecommercebe.shared.model.PagedResponseSuccess;
 import com.nr.ecommercebe.module.catalog.api.CategoryService;
 import com.nr.ecommercebe.module.catalog.api.request.CategoryRequestDto;
 import com.nr.ecommercebe.module.catalog.api.response.AdminCategoryFlatResponseDto;

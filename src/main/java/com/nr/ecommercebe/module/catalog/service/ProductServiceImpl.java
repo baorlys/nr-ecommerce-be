@@ -1,19 +1,24 @@
 package com.nr.ecommercebe.module.catalog.service;
 
-import com.nr.ecommercebe.module.catalog.api.ProductMapper;
+import com.github.f4b6a3.ulid.UlidCreator;
+import com.nr.ecommercebe.module.catalog.api.mapper.ProductMapper;
 import com.nr.ecommercebe.module.catalog.api.ProductService;
 import com.nr.ecommercebe.module.catalog.api.request.ProductFilter;
 import com.nr.ecommercebe.module.catalog.api.request.ProductRequestDto;
-import com.nr.ecommercebe.module.catalog.api.response.ProductDetailResponseDto;
-import com.nr.ecommercebe.module.catalog.api.response.ProductResponseDto;
-import com.nr.ecommercebe.module.catalog.api.response.ProductImageResponseDto;
-import com.nr.ecommercebe.module.catalog.api.response.ProductVariantResponseDto;
+import com.nr.ecommercebe.module.catalog.api.request.ProductImageRequestDto;
+import com.nr.ecommercebe.module.catalog.api.request.ProductVariantRequestDto;
+import com.nr.ecommercebe.module.catalog.api.response.*;
 import com.nr.ecommercebe.module.catalog.model.Product;
+import com.nr.ecommercebe.module.catalog.model.ProductImage;
+import com.nr.ecommercebe.module.catalog.model.ProductVariant;
+import com.nr.ecommercebe.module.catalog.model.enums.ProductStatus;
 import com.nr.ecommercebe.module.catalog.repository.ProductImageRepository;
 import com.nr.ecommercebe.module.catalog.repository.ProductRepository;
 import com.nr.ecommercebe.module.catalog.repository.ProductVariantRepository;
-import com.nr.ecommercebe.common.exception.ErrorCode;
-import com.nr.ecommercebe.common.exception.RecordNotFoundException;
+import com.nr.ecommercebe.module.messaging.ImageDeletePublisher;
+import com.nr.ecommercebe.shared.exception.ErrorCode;
+import com.nr.ecommercebe.shared.exception.RecordNotFoundException;
+import com.nr.ecommercebe.shared.util.SlugUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +27,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -33,44 +39,126 @@ public class ProductServiceImpl implements ProductService {
     ProductRepository productRepository;
     ProductVariantRepository productVariantRepository;
     ProductImageRepository productImageRepository;
+    ImageDeletePublisher imageDeletePublisher;
 
     ProductMapper mapper;
+
 
     @Override
     public ProductDetailResponseDto create(ProductRequestDto request) {
         Product product = mapper.toEntity(request);
 
-        product.setProductImages(mapper.mapImages(request.getProductImages(), product));
-        product.setProductVariants(mapper.mapVariants(request.getProductVariants(), product));
+        product.setSlug(SlugUtil.generateSlug(request.getName()));
+        product.setImages(mapper.mapImages(request.getImages(), product));
+        product.setVariants(mapper.mapVariants(request.getVariants(), product));
 
         Product createdProduct = productRepository.save(product);
         return mapper.toDto(createdProduct);
     }
 
 
-    // Fixme: Fix this method
     @Override
     public ProductDetailResponseDto update(String id, ProductRequestDto request) {
-        productRepository.findById(id)
+        Product existingProduct = productRepository.findById(id)
                 .orElseThrow(() -> {
                     log.error(ErrorCode.PRODUCT_NOT_FOUND.getDefaultMessage(id));
                     return new RecordNotFoundException(ErrorCode.PRODUCT_NOT_FOUND.getMessage());
                 });
 
-        Product updatedProduct = mapper.toEntity(request);
-        updatedProduct.setId(id);
-        Product saved = productRepository.save(updatedProduct);
-        return mapper.toDto(saved);
+        existingProduct.setName(request.getName());
+        existingProduct.setSlug(SlugUtil.generateSlug(request.getName()));
+        existingProduct.setDescription(request.getDescription());
+        existingProduct.setShortDescription(request.getShortDescription());
+        existingProduct.getCategory().setId(request.getCategoryId());
+
+        List<ProductVariantResponseDto> variantResponses = updateVariants(existingProduct, request.getVariants());
+        List<ProductImageResponseDto> imageResponses = updateImages(existingProduct, request.getImages());
+
+        Product updatedProduct = productRepository.save(existingProduct);
+
+        ProductDetailResponseDto productResponse = mapper.toDto(updatedProduct);
+        productResponse.setVariants(variantResponses);
+        productResponse.setImages(imageResponses);
+
+        return productResponse;
     }
 
+    private List<ProductVariantResponseDto> updateVariants(Product product, Set<ProductVariantRequestDto> request) {
+        Map<String, ProductVariant> existing = product.getVariants().stream()
+                .filter(v -> !v.isDeleted())
+                .collect(Collectors.toMap(ProductVariant::getId, v -> v));
 
+        List<ProductVariantResponseDto> result = new ArrayList<>();
+        Set<String> incomingIds = new HashSet<>();
+
+        for (ProductVariantRequestDto req : request) {
+            ProductVariant variant;
+            variant = mapper.toVariantEntity(req);
+            variant.setProduct(product);
+            ProductVariant updatedOrCreatedVariant = productVariantRepository.save(variant);
+            incomingIds.add(updatedOrCreatedVariant.getId());
+            result.add(mapper.toVariantResponseDto(updatedOrCreatedVariant));
+        }
+
+        for (ProductVariant variant : existing.values()) {
+            if (!incomingIds.contains(variant.getId())) {
+                variant.setDeleted(true);
+                productVariantRepository.save(variant);
+            }
+        }
+
+        return result;
+    }
+
+    private List<ProductImageResponseDto> updateImages(Product product, Set<ProductImageRequestDto> imageRequest) {
+        Map<String, ProductImage> existing = product.getImages().stream()
+                .filter(img -> !img.isDeleted())
+                .collect(Collectors.toMap(ProductImage::getId, img -> img));
+
+        List<ProductImageResponseDto> result = new ArrayList<>();
+        Set<String> incomingIds = new HashSet<>();
+
+        for (ProductImageRequestDto req : imageRequest) {
+            ProductImage image = mapper.toImageEntity(req);
+            image.setProduct(product);
+            ProductImage updatedOrCreatedImage = productImageRepository.save(image);
+            incomingIds.add(updatedOrCreatedImage.getId());
+            result.add(mapper.toImageResponseDto(updatedOrCreatedImage));
+        }
+
+        for (ProductImage img : existing.values()) {
+            if (!incomingIds.contains(img.getId())) {
+                productImageRepository.delete(img);
+                imageDeletePublisher.publish(img.getImageUrl());
+            }
+        }
+
+        return result;
+    }
 
     @Override
     public void delete(String id) {
-        if (!productRepository.existsById(id)) {
-            throw new RecordNotFoundException(ErrorCode.PRODUCT_NOT_FOUND.getMessage());
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> {
+                    log.error(ErrorCode.PRODUCT_NOT_FOUND.getDefaultMessage(id));
+                    return new RecordNotFoundException(ErrorCode.PRODUCT_NOT_FOUND.getMessage());
+                });
+
+        if (!product.getImages().isEmpty()) {
+            product.getImages().forEach(image -> {
+                productImageRepository.delete(image);
+                imageDeletePublisher.publish(image.getImageUrl());
+            });
         }
-        productRepository.deleteById(id);
+        if (!product.getVariants().isEmpty()) {
+            product.getVariants().forEach(variant -> {
+                variant.setDeleted(true);
+                productVariantRepository.save(variant);
+            });
+        }
+
+        product.setDeleted(true);
+        productRepository.save(product);
     }
 
     @Transactional(readOnly = true)
@@ -78,10 +166,11 @@ public class ProductServiceImpl implements ProductService {
     public ProductDetailResponseDto getById(String id) {
         ProductDetailResponseDto prodDto = productRepository.findByIdWithDto(id)
                 .orElseThrow(() -> new RecordNotFoundException(ErrorCode.PRODUCT_NOT_FOUND.getMessage()));
-        List<ProductVariantResponseDto> productVariants = productVariantRepository.findByProductId(prodDto.getId());
-        List<ProductImageResponseDto> productImages = productImageRepository.findByProductId(prodDto.getId());
-        prodDto.setProductVariants(productVariants);
-        prodDto.setProductImages(productImages);
+
+        List<ProductVariantResponseDto> productVariants = productVariantRepository.findByProductId(id);
+        List<ProductImageResponseDto> productImages = productImageRepository.findByProductId(id);
+        prodDto.setVariants(productVariants);
+        prodDto.setImages(productImages);
         return prodDto;
     }
 
@@ -90,6 +179,15 @@ public class ProductServiceImpl implements ProductService {
     public Page<ProductResponseDto> getAll(ProductFilter filter, Pageable pageable) {
         return productRepository.findAllAndFilterWithDto(filter, pageable);
     }
+
+    @Transactional(readOnly = true)
+    @Override
+    public Page<AdminProductResponseDto> getAllForAdmin(ProductFilter filter, Pageable pageable) {
+        return productRepository.findAllAndFilterForAdminWithDto(filter, pageable);
+    }
+
+
+
 
 
 }

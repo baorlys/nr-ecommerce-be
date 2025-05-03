@@ -1,9 +1,6 @@
 package com.nr.ecommercebe.module.catalog.api.request;
 
-import com.nr.ecommercebe.module.media.StorageType;
-import com.nr.ecommercebe.module.catalog.api.validator.ValidEnum;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,17 +14,14 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
 public class ProductImageRequestDto {
+    String id;
+
     @NotBlank(message = "Image url is required")
     String imageUrl;
 
     String altText;
 
-    @ValidEnum(enumClass = StorageType.class, message = "Invalid storage type")
-    @NotNull(message = "Storage type is required")
-    StorageType storageType;
-
     Boolean isPrimary;
 
     Integer sortOrder;
-
 }
