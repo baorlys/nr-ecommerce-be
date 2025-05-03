@@ -14,23 +14,28 @@ public class ProductDetailResponseDto {
     String name;
     String shortDescription;
     String description;
-    CategoryResponseDto category;
+    CategoryBasicInfoResponseDto category;
     List<ProductVariantResponseDto> variants;
     List<ProductImageResponseDto> images;
     Double averageRating;
     Long totalReviews;
+    Boolean isFeatured;
 
     public ProductDetailResponseDto(String id,
                                     String name,
+                                    String shortDescription,
                                     String description,
-                                    CategoryResponseDto category,
+                                    CategoryBasicInfoResponseDto category,
                                     Double averageRating,
-                                    Long totalReviews) {
+                                    Long totalReviews,
+                                    Boolean isFeatured) {
         this.id = id;
         this.name = name;
+        this.shortDescription = shortDescription;
         this.description = description;
         this.category = category;
         this.averageRating = averageRating;
         this.totalReviews = totalReviews;
+        this.isFeatured = isFeatured;
     }
 }

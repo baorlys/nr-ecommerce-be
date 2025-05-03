@@ -10,6 +10,7 @@ import com.nr.ecommercebe.module.catalog.model.Category;
 import com.nr.ecommercebe.module.catalog.model.Product;
 import com.nr.ecommercebe.module.catalog.model.ProductImage;
 import com.nr.ecommercebe.module.catalog.model.ProductVariant;
+import com.nr.ecommercebe.shared.util.SlugUtil;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -46,8 +47,6 @@ public class ProductMapper {
                     return new ProductVariantResponseDto(
                             source.getId(),
                             source.getName(),
-                            source.getWeight(),
-                            source.getUnit(),
                             source.getPrice(),
                             source.getStockQuantity()
                     );
@@ -60,28 +59,39 @@ public class ProductMapper {
         Category category = new Category();
         category.setId(dto.getCategoryId());
         product.setCategory(category);
+        product.setSlug(SlugUtil.generateSlug(dto.getName()));
         return product;
     }
 
+    public ProductDetailResponseDto toDto(Product product) {
+        ProductDetailResponseDto dto = mapper.map(product, ProductDetailResponseDto.class);
+        dto.setImages(product.getImages().stream()
+                .map(image -> mapper.map(image, ProductImageResponseDto.class))
+                .toList());
+        dto.setVariants(product.getVariants().stream()
+                .map(variant -> mapper.map(variant, ProductVariantResponseDto.class))
+                .toList());
+        return dto;
+    }
+
+
     public ProductVariant toVariantEntity(ProductVariantRequestDto dto) {
         return mapper.map(dto, ProductVariant.class);
+    }
+
+    public ProductVariantResponseDto toVariantResponseDto(ProductVariant variant) {
+        return mapper.map(variant, ProductVariantResponseDto.class);
     }
 
     public ProductImage toImageEntity(ProductImageRequestDto dto) {
         return mapper.map(dto, ProductImage.class);
     }
 
-
-    public ProductDetailResponseDto toDto(Product product) {
-        ProductDetailResponseDto dto = mapper.map(product, ProductDetailResponseDto.class);
-        dto.setImages(product.getProductImages().stream()
-                .map(image -> mapper.map(image, ProductImageResponseDto.class))
-                .toList());
-        dto.setVariants(product.getProductVariants().stream()
-                .map(variant -> mapper.map(variant, ProductVariantResponseDto.class))
-                .toList());
-        return dto;
+    public ProductImageResponseDto toImageResponseDto(ProductImage image) {
+        return mapper.map(image, ProductImageResponseDto.class);
     }
+
+
 
     public Set<ProductImage> mapImages(Set<ProductImageRequestDto> imagesDto, Product product) {
         return imagesDto.stream()

@@ -14,6 +14,8 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
 public class ProductImageRequestDto {
+    String id;
+
     @NotBlank(message = "Image url is required")
     String imageUrl;
 

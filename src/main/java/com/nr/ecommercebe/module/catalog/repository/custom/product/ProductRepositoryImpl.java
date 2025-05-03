@@ -23,19 +23,24 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
 
         CriteriaQuery<ProductResponseDto> query = cb.createQuery(ProductResponseDto.class);
         Root<Product> root = query.from(Product.class);
-        Join<Product, ProductImage> imageJoin = root.join("productImages", JoinType.LEFT);
-        Join<Product, ProductVariant> variantJoin = root.join("productVariants", JoinType.LEFT);
+        Join<Product, ProductImage> imageJoin = root.join("images", JoinType.LEFT);
+        Join<Product, ProductVariant> variantJoin = root.join("variants", JoinType.LEFT);
 
         List<Predicate> predicates = buildPredicates(cb, root, imageJoin, filter);
         query.select(cb.construct(
                         ProductResponseDto.class,
                         root.get("id"),
                         root.get("name"),
+                        root.get("slug"),
                         imageJoin.get("imageUrl"),
                         cb.min(variantJoin.get("price"))
                 ))
                 .where(cb.and(predicates.toArray(new Predicate[0])))
-                .groupBy(root.get("id"), root.get("name"), imageJoin.get("imageUrl"));
+                .groupBy(
+                        root.get("id"),
+                        root.get("name"),
+                        root.get("slug"),
+                        imageJoin.get("imageUrl"));
 
         List<ProductResponseDto> content = getPagedResult(query, pageable);
         long total = countProducts(filter);
@@ -56,16 +61,19 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                         ProductDetailResponseDto.class,
                         root.get("id"),
                         root.get("name"),
+                        root.get("shortDescription"),
                         root.get("description"),
                         cb.construct(
-                                CategoryResponseDto.class,
+                                CategoryBasicInfoResponseDto.class,
                                 categoryJoin.get("id"),
                                 categoryJoin.get("name"),
+                                categoryJoin.get("slug"),
                                 categoryJoin.get("imageUrl"),
                                 categoryJoin.get("parent").get("id")
                         ),
                         cb.avg(reviewJoin.get("rating")),
-                        cb.count(reviewJoin.get("id"))
+                        cb.count(reviewJoin.get("id")),
+                        root.get("isFeatured")
                 ))
                 .where(cb.equal(root.get("id"), id))
                 .groupBy(
@@ -89,8 +97,8 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
         CriteriaQuery<AdminProductResponseDto> query = cb.createQuery(AdminProductResponseDto.class);
         Root<Product> root = query.from(Product.class);
         Join<Product, Category> categoryJoin = root.join("category", JoinType.LEFT);
-        Join<Product, ProductImage> imageJoin = root.join("productImages", JoinType.LEFT);
-        Join<Product, ProductVariant> variantJoin = root.join("productVariants", JoinType.LEFT);
+        Join<Product, ProductImage> imageJoin = root.join("images", JoinType.LEFT);
+        Join<Product, ProductVariant> variantJoin = root.join("variants", JoinType.LEFT);
         Join<Product, Review> reviewJoin = root.join("reviews", JoinType.LEFT);
 
         List<Predicate> predicates = buildPredicates(cb, root, imageJoin, filter);
@@ -149,7 +157,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
         Root<Product> root = countQuery.from(Product.class);
-        Join<Product, ProductImage> imageJoin = root.join("productImages");
+        Join<Product, ProductImage> imageJoin = root.join("images");
 
         List<Predicate> countPredicates = new ArrayList<>();
         countPredicates.add(cb.isTrue(imageJoin.get("isPrimary")));

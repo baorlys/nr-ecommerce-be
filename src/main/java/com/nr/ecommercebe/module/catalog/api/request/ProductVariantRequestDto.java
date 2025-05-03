@@ -1,7 +1,5 @@
 package com.nr.ecommercebe.module.catalog.api.request;
 
-import com.nr.ecommercebe.module.catalog.api.validator.ValidEnum;
-import com.nr.ecommercebe.module.catalog.model.enums.ProductVariantUnit;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,15 +15,10 @@ import java.math.BigDecimal;
 @Builder
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
 public class ProductVariantRequestDto {
+    String id;
+
     @NotNull(message = "Variant name is required")
     String name;
-
-    @NotNull(message = "Weight is required")
-    BigDecimal weight;
-
-    @ValidEnum(enumClass = ProductVariantUnit.class, message = "Invalid unit")
-    @NotNull(message = "Unit is required")
-    ProductVariantUnit unit;
 
     @NotNull(message = "Price is required")
     BigDecimal price;

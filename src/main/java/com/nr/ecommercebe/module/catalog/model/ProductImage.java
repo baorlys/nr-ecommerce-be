@@ -6,13 +6,14 @@ import com.nr.ecommercebe.shared.model.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import lombok.experimental.SuperBuilder;
 
 @Entity(name = "product_images")
 @Getter
 @Setter
 @ToString(exclude = {"product"})
 @EqualsAndHashCode(callSuper = true, exclude = {"product"})
-@Builder
+@SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
