@@ -1,9 +1,10 @@
 package com.nr.ecommercebe.module.user.api.response;
 
-import com.nr.ecommercebe.module.user.model.RoleName;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDate;
 
 @Data
 @AllArgsConstructor
@@ -14,7 +15,8 @@ public class UserResponseDto {
     String firstName;
     String lastName;
     String phone;
-    String fullName;
-    RoleName role;
+    RoleResponseDto role;
+    LocalDate createdOn;
+    LocalDate updatedOn;
 }
 

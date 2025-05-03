@@ -49,7 +49,6 @@ public class AuthServiceImpl implements AuthService {
         String refreshToken = jwtService.generateRefreshToken(userDetails);
 
         UserResponseDto userResponse = mapper.toDTO(userDetails.user());
-        userResponse.setRole(userDetails.getRole());
 
         return LoginResponseDto.builder()
                 .accessToken(accessToken)
@@ -103,12 +102,7 @@ public class AuthServiceImpl implements AuthService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new JwtException(ErrorCode.USER_NOT_FOUND.getMessage()));
 
-        UserResponseDto userResponse = mapper.toDTO(user);
-
-        String roleName = jwtService.getRole(accessToken).replace("ROLE_", "");
-        userResponse.setRole(RoleName.valueOf(roleName));
-
-        return userResponse;
+        return mapper.toDTO(user);
 
     }
 }

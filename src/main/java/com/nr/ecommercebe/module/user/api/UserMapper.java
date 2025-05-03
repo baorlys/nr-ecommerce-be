@@ -18,11 +18,7 @@ public class UserMapper {
 
 
     public UserResponseDto toDTO(User user) {
-        UserResponseDto dto = modelMapper.map(user, UserResponseDto.class);
-        String firstName = user.getFirstName() != null ? user.getFirstName() : "";
-        String lastName = user.getLastName() != null ? user.getLastName() : "";
-        dto.setFullName((firstName + " " + lastName).trim());
-        return dto;
+        return modelMapper.map(user, UserResponseDto.class);
     }
 
     public User toEntity(RegisterRequestDto userDTO) {
