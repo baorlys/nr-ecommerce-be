@@ -25,7 +25,6 @@ public class ProductSpecs {
             addCategoryPredicate(filter, root, cb, predicates);
             addPricePredicates(filter, root, cb, predicates);
             addIsFeaturedPredicate(filter, root, cb, predicates);
-            addSortingPredicate(filter, query, cb, root);
 
             Join<Product, ProductVariant> variantJoin = root.join("productVariants", JoinType.LEFT);
             Join<Product, ProductImage> imageJoin = root.join("productImages", JoinType.LEFT);
@@ -75,14 +74,5 @@ public class ProductSpecs {
                 .ifPresent(isFeatured -> predicates.add(cb.isTrue(root.get("isFeatured"))));
     }
 
-    private static void addSortingPredicate(ProductFilter filter, CriteriaQuery<?> query, CriteriaBuilder cb, Root<Product> root) {
-        Optional.ofNullable(filter.getSortBy())
-                .ifPresent(sortBy -> {
-                    if ("asc".equalsIgnoreCase(filter.getSortDirection())) {
-                        query.orderBy(cb.asc(root.get(sortBy)));
-                    } else {
-                        query.orderBy(cb.desc(root.get(sortBy)));
-                    }
-                });
-    }
+
 }

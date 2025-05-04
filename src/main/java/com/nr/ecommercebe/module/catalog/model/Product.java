@@ -36,13 +36,13 @@ public class Product extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     Category category;
 
-    @OneToMany(mappedBy = "product",fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "product",fetch = FetchType.LAZY, orphanRemoval = true)
     Set<ProductImage> images;
 
-    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY, orphanRemoval = true)
     Set<ProductVariant> variants;
 
-    @OneToMany(mappedBy = "product",fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "product",fetch = FetchType.LAZY, orphanRemoval = true)
     Set<Review> reviews;
 
     Boolean isFeatured;

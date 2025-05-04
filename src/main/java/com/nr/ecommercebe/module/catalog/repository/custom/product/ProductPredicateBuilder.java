@@ -21,7 +21,7 @@ public class ProductPredicateBuilder {
         List<Predicate> predicates = new ArrayList<>();
 
         addSearchPredicate(productFilter, root, cb, predicates);
-        addCategoryPredicate(productFilter, root, cb, predicates);
+        addCategoryPredicate(productFilter, root, predicates);
         addPricePredicates(productFilter, root, cb, predicates);
         addIsFeaturedPredicate(productFilter, root, cb, predicates);
 
@@ -31,22 +31,24 @@ public class ProductPredicateBuilder {
     private static void addSearchPredicate(ProductFilter filter, Root<Product> root, CriteriaBuilder cb, List<Predicate> predicates) {
         Optional.ofNullable(filter.getSearch())
                 .filter(search -> !search.trim().isEmpty()) // Ensure search is not empty
-                .ifPresent(search -> predicates.add(cb.like(cb.lower(root.get("name")), "%" + search.toLowerCase() + "%")));
+                .ifPresent(search -> predicates.add(cb.or(
+                        cb.like(cb.lower(root.get("name")), "%" + search.toLowerCase() + "%"),
+                        cb.like(cb.lower(root.get("slug")), "%" + search.toLowerCase() + "%"))));
     }
 
     // Category predicate (filter by category ID)
-    private static void addCategoryPredicate(ProductFilter filter, Root<Product> root, CriteriaBuilder cb, List<Predicate> predicates) {
+    private static void addCategoryPredicate(ProductFilter filter, Root<Product> root, List<Predicate> predicates) {
         Optional.ofNullable(filter.getCategoryId())
-                .ifPresent(categoryId -> predicates.add(cb.equal(root.get("category").get("id"), categoryId)));
+                .ifPresent(categoryId -> predicates.add(root.get("category").get("id").in(filter.getCategoryIds())));
     }
 
     // Price predicates (filter by price range)
     private static void addPricePredicates(ProductFilter filter, Root<Product> root, CriteriaBuilder cb, List<Predicate> predicates) {
         Optional.ofNullable(filter.getMinPrice())
-                .ifPresent(minPrice -> predicates.add(cb.greaterThanOrEqualTo(root.get("price"), minPrice)));
+                .ifPresent(minPrice -> predicates.add(cb.greaterThanOrEqualTo(root.get("variants").get("price"), minPrice)));
 
         Optional.ofNullable(filter.getMaxPrice())
-                .ifPresent(maxPrice -> predicates.add(cb.lessThanOrEqualTo(root.get("price"), maxPrice)));
+                .ifPresent(maxPrice -> predicates.add(cb.lessThanOrEqualTo(root.get("variants").get("price"), maxPrice)));
     }
 
     // Featured predicate (filter by featured status)

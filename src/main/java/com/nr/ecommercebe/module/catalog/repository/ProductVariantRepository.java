@@ -9,5 +9,5 @@ import java.util.List;
 
 @Repository
 public interface ProductVariantRepository extends JpaRepository<ProductVariant, String> {
-    List<ProductVariantResponseDto> findByProductId(String productId);
+    List<ProductVariantResponseDto> findByProductIdAndDeletedFalse(String productId);
 }

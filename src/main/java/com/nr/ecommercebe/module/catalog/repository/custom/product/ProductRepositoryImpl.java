@@ -1,6 +1,7 @@
 package com.nr.ecommercebe.module.catalog.repository.custom.product;
 
 import com.nr.ecommercebe.module.catalog.api.request.ProductFilter;
+import com.nr.ecommercebe.module.catalog.api.request.ProductSortOption;
 import com.nr.ecommercebe.module.catalog.api.response.*;
 import com.nr.ecommercebe.module.catalog.model.*;
 import com.nr.ecommercebe.module.review.model.Review;
@@ -26,7 +27,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
         Join<Product, ProductImage> imageJoin = root.join("images", JoinType.LEFT);
         Join<Product, ProductVariant> variantJoin = root.join("variants", JoinType.LEFT);
 
-        List<Predicate> predicates = buildPredicates(cb, root, imageJoin, filter);
+        List<Predicate> predicates = buildPredicates(cb, root, filter);
         query.select(cb.construct(
                         ProductResponseDto.class,
                         root.get("id"),
@@ -35,13 +36,16 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                         imageJoin.get("imageUrl"),
                         cb.min(variantJoin.get("price"))
                 ))
-                .where(cb.and(predicates.toArray(new Predicate[0])))
+                .where(cb.and(predicates.toArray(new Predicate[0])),
+                        cb.isTrue(imageJoin.get("isPrimary")),
+                        cb.isFalse(variantJoin.get("deleted")))
                 .groupBy(
                         root.get("id"),
                         root.get("name"),
                         root.get("slug"),
                         imageJoin.get("imageUrl"));
 
+        applySorting(query, cb, root, filter);
         List<ProductResponseDto> content = getPagedResult(query, pageable);
         long total = countProducts(filter);
 
@@ -101,7 +105,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
         Join<Product, ProductVariant> variantJoin = root.join("variants", JoinType.LEFT);
         Join<Product, Review> reviewJoin = root.join("reviews", JoinType.LEFT);
 
-        List<Predicate> predicates = buildPredicates(cb, root, imageJoin, filter);
+        List<Predicate> predicates = buildPredicates(cb, root, filter);
         query.select(cb.construct(
                         AdminProductResponseDto.class,
                         root.get("id"),
@@ -117,7 +121,9 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                         root.get("createdOn"),
                         root.get("updatedOn")
                 ))
-                .where(cb.and(predicates.toArray(new Predicate[0])))
+                .where(cb.and(predicates.toArray(new Predicate[0])),
+                        cb.isTrue(imageJoin.get("isPrimary")),
+                        cb.isFalse(variantJoin.get("deleted")))
                 .groupBy(
                         root.get("id"),
                         root.get("name"),
@@ -129,7 +135,6 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                         root.get("createdOn"),
                         root.get("updatedOn")
                 );
-
         List<AdminProductResponseDto> content = getPagedResult(query, pageable);
         long total = countProducts(filter);
 
@@ -138,12 +143,19 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
 
     // -------------------------- Private Utility Methods --------------------------
 
-    private List<Predicate> buildPredicates(CriteriaBuilder cb, Root<Product> root,
-                                            Join<Product, ProductImage> imageJoin, ProductFilter filter) {
-        List<Predicate> predicates = new ArrayList<>();
-        predicates.add(cb.isTrue(imageJoin.get("isPrimary")));
-        predicates.addAll(new ProductPredicateBuilder(filter).build(cb, root));
-        return predicates;
+    private List<Predicate> buildPredicates(CriteriaBuilder cb,
+                                            Root<Product> root,
+                                             ProductFilter filter) {
+        return new ArrayList<>(new ProductPredicateBuilder(filter).build(cb, root));
+    }
+
+    private void applySorting(CriteriaQuery<?> query, CriteriaBuilder cb, Root<Product> root, ProductFilter filter) {
+        ProductSortOption sortOption = Optional.ofNullable(filter.getSortBy()).orElse(ProductSortOption.NEWEST);
+        switch (sortOption) {
+            case PRICE_ASC -> query.orderBy(cb.asc(cb.min(root.get("variants").get("price"))));
+            case PRICE_DESC -> query.orderBy(cb.desc(cb.min(root.get("variants").get("price"))));
+            case NEWEST -> query.orderBy(cb.desc(root.get("createdOn")));
+        }
     }
 
     private <T> List<T> getPagedResult(CriteriaQuery<T> query, Pageable pageable) {

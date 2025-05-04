@@ -3,6 +3,8 @@ package com.nr.ecommercebe.module.catalog.api.request;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -11,9 +13,9 @@ import lombok.experimental.FieldDefaults;
 public class ProductFilter {
     String search;
     String categoryId;
+    List<String> categoryIds;
     Double minPrice;
     Double maxPrice;
     Boolean isFeatured;
-    String sortBy;
-    String sortDirection;
+    ProductSortOption sortBy;
 }

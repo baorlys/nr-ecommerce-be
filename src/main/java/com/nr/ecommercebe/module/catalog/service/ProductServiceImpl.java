@@ -12,6 +12,7 @@ import com.nr.ecommercebe.module.catalog.model.Product;
 import com.nr.ecommercebe.module.catalog.model.ProductImage;
 import com.nr.ecommercebe.module.catalog.model.ProductVariant;
 import com.nr.ecommercebe.module.catalog.model.enums.ProductStatus;
+import com.nr.ecommercebe.module.catalog.repository.CategoryRepository;
 import com.nr.ecommercebe.module.catalog.repository.ProductImageRepository;
 import com.nr.ecommercebe.module.catalog.repository.ProductRepository;
 import com.nr.ecommercebe.module.catalog.repository.ProductVariantRepository;
@@ -39,6 +40,7 @@ public class ProductServiceImpl implements ProductService {
     ProductRepository productRepository;
     ProductVariantRepository productVariantRepository;
     ProductImageRepository productImageRepository;
+    CategoryRepository categoryRepository;
     ImageDeletePublisher imageDeletePublisher;
 
     ProductMapper mapper;
@@ -47,12 +49,16 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductDetailResponseDto create(ProductRequestDto request) {
         Product product = mapper.toEntity(request);
-
         product.setSlug(SlugUtil.generateSlug(request.getName()));
-        product.setImages(mapper.mapImages(request.getImages(), product));
-        product.setVariants(mapper.mapVariants(request.getVariants(), product));
 
         Product createdProduct = productRepository.save(product);
+
+        Set<ProductImage> productImages = mapper.mapImages(request.getImages(), createdProduct);
+        Set<ProductVariant> productVariants = mapper.mapVariants(request.getVariants(), createdProduct);
+
+        productImageRepository.saveAll(productImages);
+        productVariantRepository.saveAll(productVariants);
+
         return mapper.toDto(createdProduct);
     }
 
@@ -128,8 +134,9 @@ public class ProductServiceImpl implements ProductService {
 
         for (ProductImage img : existing.values()) {
             if (!incomingIds.contains(img.getId())) {
-                productImageRepository.delete(img);
                 imageDeletePublisher.publish(img.getImageUrl());
+                product.getImages().remove(img);
+                productImageRepository.delete(img);
             }
         }
 
@@ -167,8 +174,8 @@ public class ProductServiceImpl implements ProductService {
         ProductDetailResponseDto prodDto = productRepository.findByIdWithDto(id)
                 .orElseThrow(() -> new RecordNotFoundException(ErrorCode.PRODUCT_NOT_FOUND.getMessage()));
 
-        List<ProductVariantResponseDto> productVariants = productVariantRepository.findByProductId(id);
-        List<ProductImageResponseDto> productImages = productImageRepository.findByProductId(id);
+        List<ProductVariantResponseDto> productVariants = productVariantRepository.findByProductIdAndDeletedFalse(id);
+        List<ProductImageResponseDto> productImages = productImageRepository.findByProductIdAndDeletedFalse(id);
         prodDto.setVariants(productVariants);
         prodDto.setImages(productImages);
         return prodDto;
@@ -177,6 +184,15 @@ public class ProductServiceImpl implements ProductService {
     @Transactional(readOnly = true)
     @Override
     public Page<ProductResponseDto> getAll(ProductFilter filter, Pageable pageable) {
+        if (filter.getCategoryId() != null) {
+            List<CategoryId> subCategoryIds = categoryRepository.findByParentId(filter.getCategoryId());
+            subCategoryIds.add(filter::getCategoryId);
+            List<String> categoryIds = subCategoryIds.stream()
+                    .map(CategoryId::getId)
+                    .toList();
+            filter.setCategoryIds(categoryIds);
+        }
+
         return productRepository.findAllAndFilterWithDto(filter, pageable);
     }
 

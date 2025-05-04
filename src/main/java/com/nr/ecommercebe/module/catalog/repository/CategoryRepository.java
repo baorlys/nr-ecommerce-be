@@ -1,5 +1,6 @@
 package com.nr.ecommercebe.module.catalog.repository;
 
+import com.nr.ecommercebe.module.catalog.api.response.CategoryId;
 import com.nr.ecommercebe.module.catalog.model.Category;
 import com.nr.ecommercebe.module.catalog.repository.custom.category.CategoryRepositoryCustom;
 import org.springframework.data.domain.Page;
@@ -24,4 +25,6 @@ public interface CategoryRepository extends JpaRepository<Category, String>, Cat
     List<Category> findAllByParent(Category category);
 
     boolean existsByNameAndIdIsNotAndDeletedIsFalse(String name, String id);
+
+    List<CategoryId> findByParentId(String parentId);
 }
