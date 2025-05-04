@@ -3,6 +3,8 @@ package com.nr.ecommercebe.module.media.cloudinary;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import com.nr.ecommercebe.module.media.MediaService;
+import com.nr.ecommercebe.module.messaging.RabbitConfig;
+import com.nr.ecommercebe.shared.event.ImageDeleteEvent;
 import com.nr.ecommercebe.shared.exception.DeleteImageException;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -31,10 +33,10 @@ public class CloudinaryService implements MediaService {
         return (String) data.get("url");
     }
 
-    @RabbitListener
-    public void deleteImage(String imageUrl) {
+    @RabbitListener(queues = RabbitConfig.IMAGE_DELETE_QUEUE)
+    public void deleteImage(ImageDeleteEvent event) {
         try {
-            String publicId = extractPublicIdFromUrl(imageUrl);
+            String publicId = extractPublicIdFromUrl(event.getImageUrl());
             cloudinary.uploader().destroy(publicId, ObjectUtils.emptyMap());
         } catch (Exception e) {
             throw new DeleteImageException("Failed to delete image: " + e.getMessage());
