@@ -2,6 +2,7 @@ package com.nr.ecommercebe.module.catalog.repository.custom.category;
 
 import com.nr.ecommercebe.module.catalog.api.response.CategoryResponseDto;
 import com.nr.ecommercebe.module.catalog.model.Category;
+import com.nr.ecommercebe.shared.model.BaseEntity;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.criteria.*;
@@ -41,7 +42,9 @@ public class CategoryRepositoryImpl implements CategoryRepositoryCustom {
                 category.getSlug(),
                 category.getDescription(),
                 category.getImageUrl(),
-                category.getParent().getId(),
+                Optional.ofNullable(category.getParent())
+                        .map(BaseEntity::getId)
+                        .orElse(null),
                 new ArrayList<>(List.of(subCategoriesDto))// No deeper nesting
         );
     }
@@ -53,7 +56,9 @@ public class CategoryRepositoryImpl implements CategoryRepositoryCustom {
                 category.getSlug(),
                 category.getDescription(),
                 category.getImageUrl(),
-                category.getParent().getId(),
+                Optional.ofNullable(category.getParent())
+                        .map(Category::getId)
+                        .orElse(null),
                 new ArrayList<>()// No deeper nesting
         );
     }

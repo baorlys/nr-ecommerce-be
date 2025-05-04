@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Set;
 
 @Service
 @Transactional
@@ -60,6 +61,7 @@ public class CategoryServiceImpl implements CategoryService {
         category.setSlug(SlugUtil.generateSlug(request.getName()));
         category.setParent(request.getParentId() != null ? categoryRepository.findById(request.getParentId())
                 .orElseThrow(() -> new RecordNotFoundException(ErrorCode.CATEGORY_NOT_FOUND.getMessage())) : null);
+        category.setImageUrl(request.getImageUrl());
 
         Category updatedCategory = categoryRepository.save(category);
 
@@ -69,19 +71,19 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public void delete(String id) {
-        Category category = categoryRepository.findById(id)
+        Category category = categoryRepository.findByIdAndDeletedIsFalse(id)
                 .orElseThrow(() -> {
                     log.error(ErrorCode.CATEGORY_NOT_FOUND.getDefaultMessage(id));
                     return new RecordNotFoundException(ErrorCode.CATEGORY_NOT_FOUND.getMessage());
                 });
 
-        List<Product> products = productRepository.findAllByCategory(category);
+        Set<Product> products = category.getProducts();
         products.forEach(product -> {
             product.setCategory(null);
             productRepository.save(product);
         });
 
-        List<Category> subCategories = categoryRepository.findAllByParent(category);
+        List<Category> subCategories = category.getSubCategories();
         subCategories.forEach( childCategory -> {
             childCategory.setParent(null);
             categoryRepository.save(childCategory);
