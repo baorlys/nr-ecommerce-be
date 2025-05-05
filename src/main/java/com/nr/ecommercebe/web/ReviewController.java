@@ -1,8 +1,9 @@
 package com.nr.ecommercebe.web;
 
+import com.nr.ecommercebe.module.review.api.request.ReviewRequestDto;
 import com.nr.ecommercebe.shared.model.PagedResponseSuccess;
-import com.nr.ecommercebe.module.review.api.ReviewFilter;
-import com.nr.ecommercebe.module.review.api.ReviewResponseDto;
+import com.nr.ecommercebe.module.review.api.request.ReviewFilter;
+import com.nr.ecommercebe.module.review.api.response.ReviewResponseDto;
 import com.nr.ecommercebe.module.review.api.ReviewService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -28,4 +29,20 @@ public class ReviewController {
         Page<ReviewResponseDto> reviewPage = reviewService.getAll(filter, pageRequest);
         return ResponseEntity.ok(new PagedResponseSuccess<>("Review fetched successfully",reviewPage));
     }
+
+    @GetMapping("/eligibility")
+    public ResponseEntity<Boolean> isEligibleForReview(
+            @RequestParam String productId,
+            @RequestParam String userId) {
+        boolean isEligible = reviewService.isEligibleForReview(productId, userId);
+        return ResponseEntity.ok(isEligible);
+    }
+
+    @PostMapping
+    public ResponseEntity<ReviewResponseDto> create(@RequestBody ReviewRequestDto review) {
+        ReviewResponseDto createdReview = reviewService.create(review);
+        return ResponseEntity.ok(createdReview);
+    }
+
+
 }

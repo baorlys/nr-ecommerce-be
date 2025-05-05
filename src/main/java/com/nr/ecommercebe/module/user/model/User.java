@@ -35,4 +35,8 @@ public class User extends BaseEntity {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(nullable = false)
     Role role;
+
+    public User(String id) {
+        this.id = id;
+    }
 }

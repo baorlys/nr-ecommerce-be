@@ -49,4 +49,8 @@ public class Product extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     ProductStatus status;
+
+    public Product(String id) {
+        this.id = id;
+    }
 }

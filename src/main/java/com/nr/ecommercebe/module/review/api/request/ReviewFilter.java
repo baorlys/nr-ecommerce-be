@@ -1,4 +1,4 @@
-package com.nr.ecommercebe.module.review.api;
+package com.nr.ecommercebe.module.review.api.request;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
