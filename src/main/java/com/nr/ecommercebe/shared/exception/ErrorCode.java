@@ -21,6 +21,8 @@ public enum ErrorCode {
             "Category name %s already exists"),
     PRODUCT_NAME_ALREADY_EXISTS("product.name.already.exists", "Product name already exists",
             "Product name %s already exists"),
+    REVIEW_ALREADY_EXISTS("review.already.exists", "Review already exists",
+            "Review already exists for product %s and user %s"),
     EMAIL_EXISTS("email.exists", "Email already exists",
             "Email %s already exists"),
     PHONE_EXISTS("phone.exists", "Phone already exists",
@@ -32,7 +34,7 @@ public enum ErrorCode {
     JWT_IS_INVALID("jwt.is_invalid", "JWT is invalid",
             "JWT is invalid"),
     UNAUTHORIZED("unauthorized", "Access denied. Invalid or missing token.",
-            "Unauthorized access");
+            "Unauthorized access"), ;
 
 
 
