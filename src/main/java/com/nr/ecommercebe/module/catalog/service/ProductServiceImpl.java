@@ -43,6 +43,7 @@ public class ProductServiceImpl implements ProductService {
     CategoryRepository categoryRepository;
     ImageDeletePublisher imageDeletePublisher;
 
+
     ProductMapper mapper;
 
 
@@ -184,23 +185,42 @@ public class ProductServiceImpl implements ProductService {
     @Transactional(readOnly = true)
     @Override
     public Page<ProductResponseDto> getAll(ProductFilter filter, Pageable pageable) {
-        if (filter.getCategoryId() != null) {
-            List<CategoryId> subCategoryIds = categoryRepository.findByParentId(filter.getCategoryId());
-            subCategoryIds.add(filter::getCategoryId);
-            List<String> categoryIds = subCategoryIds.stream()
-                    .map(CategoryId::getId)
-                    .toList();
-            filter.setCategoryIds(categoryIds);
-        }
-
-        return productRepository.findAllAndFilterWithDto(filter, pageable);
+        ProductFilter enrichedFilter = enrichFilterWithSubcategories(filter);
+        return productRepository.findAllAndFilterWithDto(enrichedFilter, pageable);
     }
 
     @Transactional(readOnly = true)
     @Override
     public Page<AdminProductResponseDto> getAllForAdmin(ProductFilter filter, Pageable pageable) {
-        return productRepository.findAllAndFilterForAdminWithDto(filter, pageable);
+        ProductFilter enrichedFilter = enrichFilterWithSubcategories(filter);
+        return productRepository.findAllAndFilterForAdminWithDto(enrichedFilter, pageable);
     }
+
+    private ProductFilter enrichFilterWithSubcategories(ProductFilter filter) {
+        List<String> categoryIds = null;
+        if (filter.getCategoryId() != null) {
+            List<CategoryId> subCategoryIds = categoryRepository.findByParentId(filter.getCategoryId());
+            subCategoryIds.add(filter::getCategoryId);
+            categoryIds = subCategoryIds.stream()
+                    .map(CategoryId::getId)
+                    .toList();
+        }
+
+        List<String> categorySlugs = null;
+        if (filter.getCategorySlug() != null) {
+            List<CategorySlug> subCategorySlugs = categoryRepository.findByParentSlug(filter.getCategorySlug());
+            subCategorySlugs.add(filter::getCategorySlug);
+            categorySlugs = subCategorySlugs.stream()
+                    .map(CategorySlug::getSlug)
+                    .toList();
+        }
+
+        return filter.toBuilder()
+                .categoryIds(categoryIds)
+                .categorySlugs(categorySlugs)
+                .build();
+    }
+
 
     @Override
     public ProductDetailResponseDto getBySlug(String slug) {

@@ -1,5 +1,6 @@
 package com.nr.ecommercebe.module.catalog.api;
 
+import com.nr.ecommercebe.module.catalog.api.request.CategoryFilter;
 import com.nr.ecommercebe.module.catalog.api.request.CategoryRequestDto;
 import com.nr.ecommercebe.module.catalog.api.response.AdminCategoryFlatResponseDto;
 import com.nr.ecommercebe.module.catalog.api.response.CategoryResponseDto;
@@ -11,5 +12,5 @@ import java.util.List;
 
 public interface CategoryService extends BaseCrudService<String, CategoryRequestDto, CategoryResponseDto> {
     List<CategoryResponseDto> getAll();
-    Page<AdminCategoryFlatResponseDto> getAllFlatForAdmin(Pageable pageable);
+    Page<AdminCategoryFlatResponseDto> getAllFlatForAdmin(CategoryFilter filter, Pageable pageable);
 }

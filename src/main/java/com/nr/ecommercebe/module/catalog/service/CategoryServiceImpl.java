@@ -1,4 +1,6 @@
 package com.nr.ecommercebe.module.catalog.service;
+import com.nr.ecommercebe.module.catalog.api.request.CategoryFilter;
+import com.nr.ecommercebe.module.catalog.repository.specification.CategorySpecs;
 import com.nr.ecommercebe.shared.util.SlugUtil;
 import com.nr.ecommercebe.module.catalog.api.mapper.CategoryMapper;
 import com.nr.ecommercebe.module.catalog.api.CategoryService;
@@ -17,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -112,12 +115,18 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Transactional(readOnly = true)
     @Override
-    public Page<AdminCategoryFlatResponseDto> getAllFlatForAdmin(Pageable pageable) {
-        Page<Category> categories = categoryRepository.findAllByDeletedIsFalse(pageable);
-        List<AdminCategoryFlatResponseDto> categoriesFlatResponse = categories.getContent().stream()
-                .map(mapper::toAdminCategoryFlatResponseDto)
-                .toList();
-        return new PageImpl<>(categoriesFlatResponse, pageable, categories.getTotalElements());
+    public Page<AdminCategoryFlatResponseDto> getAllFlatForAdmin(CategoryFilter filter, Pageable pageable) {
+        Specification<Category> spec = Specification
+                .where(CategorySpecs.isDeletedFalse())
+                .and(CategorySpecs.searchWith(filter.getSearch()));
+        Page<Category> categories = categoryRepository.findAll(spec, pageable);
+        return new PageImpl<>(
+                categories.getContent().stream()
+                        .map(mapper::toAdminCategoryFlatResponseDto)
+                        .toList(),
+                pageable,
+                categories.getTotalElements()
+        );
     }
 
 }

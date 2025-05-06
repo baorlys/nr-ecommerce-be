@@ -1,5 +1,6 @@
 package com.nr.ecommercebe.web.admin;
 
+import com.nr.ecommercebe.module.catalog.api.request.CategoryFilter;
 import com.nr.ecommercebe.shared.model.PagedResponseSuccess;
 import com.nr.ecommercebe.module.catalog.api.CategoryService;
 import com.nr.ecommercebe.module.catalog.api.request.CategoryRequestDto;
@@ -45,9 +46,10 @@ public class CategoryAdminController {
     @GetMapping()
     public ResponseEntity<PagedResponseSuccess<AdminCategoryFlatResponseDto>> getAllCategories(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = "10") int size,
+            @ModelAttribute CategoryFilter filter) {
         PageRequest pageRequest = PageRequest.of(page, size);
-        Page<AdminCategoryFlatResponseDto> categories = categoryService.getAllFlatForAdmin(pageRequest);
+        Page<AdminCategoryFlatResponseDto> categories = categoryService.getAllFlatForAdmin(filter, pageRequest);
         return ResponseEntity.ok(new PagedResponseSuccess<>("Categories fetched successfully", categories));
     }
 

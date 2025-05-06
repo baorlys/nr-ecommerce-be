@@ -22,6 +22,7 @@ public class ProductPredicateBuilder {
 
         addSearchPredicate(productFilter, root, cb, predicates);
         addCategoryPredicate(productFilter, root, predicates);
+        addCategorySlugPredicate(productFilter, root, predicates);
         addPricePredicates(productFilter, root, cb, predicates);
         addIsFeaturedPredicate(productFilter, root, cb, predicates);
 
@@ -40,6 +41,12 @@ public class ProductPredicateBuilder {
     private static void addCategoryPredicate(ProductFilter filter, Root<Product> root, List<Predicate> predicates) {
         Optional.ofNullable(filter.getCategoryId())
                 .ifPresent(categoryId -> predicates.add(root.get("category").get("id").in(filter.getCategoryIds())));
+    }
+
+    // Category Slug predicate (filter by category slug)
+    private static void addCategorySlugPredicate(ProductFilter filter, Root<Product> root, List<Predicate> predicates) {
+        Optional.ofNullable(filter.getCategorySlug())
+                .ifPresent(categorySlug -> predicates.add(root.get("category").get("slug").in(filter.getCategorySlugs())));
     }
 
     // Price predicates (filter by price range)

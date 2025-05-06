@@ -83,9 +83,9 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                         categoryJoin.get("id"),
                         categoryJoin.get("name"),
                         root.get("isFeatured"),
-                        cb.count(variantJoin.get("id")),
+                        cb.countDistinct( variantJoin.get("id")),
                         cb.avg(reviewJoin.get("rating")),
-                        cb.count(reviewJoin.get("id")),
+                        cb.countDistinct(reviewJoin.get("id")),
                         root.get("createdOn"),
                         root.get("updatedOn")
                 ))
