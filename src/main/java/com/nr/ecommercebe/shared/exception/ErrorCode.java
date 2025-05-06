@@ -15,6 +15,8 @@ public enum ErrorCode {
             "Product image with ID%s not found" ),
     PRODUCT_VARIANT_NOT_FOUND("product.variant.not.found", "Product variant not found",
             "Product variant with ID%s not found" ),
+    CART_NOT_FOUND("cart.not.found", "Cart not found",
+            "Cart with ID%s not found" ),
     USER_NOT_FOUND("user.not.found", "User not found",
             "User with ID%s not found" ),
     CATEGORY_NAME_ALREADY_EXISTS("category.name.already.exists", "Category name already exists",
@@ -36,7 +38,7 @@ public enum ErrorCode {
     UNAUTHORIZED("unauthorized", "Access denied. Invalid or missing token.",
             "Unauthorized access"),
     PASSWORD_IS_INCORRECT("password.is.incorrect", "Password is incorrect",
-            "Password is incorrect");
+            "Password is incorrect"), ;
 
 
 

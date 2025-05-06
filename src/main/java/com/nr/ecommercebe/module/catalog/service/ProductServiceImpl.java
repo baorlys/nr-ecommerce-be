@@ -1,6 +1,5 @@
 package com.nr.ecommercebe.module.catalog.service;
 
-import com.github.f4b6a3.ulid.UlidCreator;
 import com.nr.ecommercebe.module.catalog.api.mapper.ProductMapper;
 import com.nr.ecommercebe.module.catalog.api.ProductService;
 import com.nr.ecommercebe.module.catalog.api.request.ProductFilter;
@@ -11,7 +10,6 @@ import com.nr.ecommercebe.module.catalog.api.response.*;
 import com.nr.ecommercebe.module.catalog.model.Product;
 import com.nr.ecommercebe.module.catalog.model.ProductImage;
 import com.nr.ecommercebe.module.catalog.model.ProductVariant;
-import com.nr.ecommercebe.module.catalog.model.enums.ProductStatus;
 import com.nr.ecommercebe.module.catalog.repository.CategoryRepository;
 import com.nr.ecommercebe.module.catalog.repository.ProductImageRepository;
 import com.nr.ecommercebe.module.catalog.repository.ProductRepository;
@@ -234,6 +232,12 @@ public class ProductServiceImpl implements ProductService {
         prodDto.setVariants(productVariants);
         prodDto.setImages(productImages);
         return prodDto;
+    }
+
+    @Override
+    public ProductVariant getProductVariantById(String variantId) {
+        return productVariantRepository.findByIdAndDeletedFalse(variantId)
+                .orElseThrow(() -> new RecordNotFoundException(ErrorCode.PRODUCT_VARIANT_NOT_FOUND.getMessage()));
     }
 
 

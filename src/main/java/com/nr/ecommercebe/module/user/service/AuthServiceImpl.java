@@ -130,13 +130,19 @@ public class AuthServiceImpl implements AuthService {
         userRepository.save(user);
     }
 
-    private User getUserFromAccessToken(String accessToken) {
+    @Override
+    public User getUserFromAccessToken(String accessToken) {
+        String userId = getUserIdFromAccessToken(accessToken);
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new JwtException(ErrorCode.USER_NOT_FOUND.getMessage()));
+    }
+
+    @Override
+    public String getUserIdFromAccessToken(String accessToken) {
         if(!jwtService.isTokenValid(accessToken)) {
             throw new JwtException(ErrorCode.JWT_IS_INVALID.getMessage());
         }
 
-        String userId = jwtService.getUsername(accessToken);
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new JwtException(ErrorCode.USER_NOT_FOUND.getMessage()));
+        return jwtService.getUsername(accessToken);
     }
 }
