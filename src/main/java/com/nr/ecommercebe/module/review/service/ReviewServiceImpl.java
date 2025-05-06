@@ -64,8 +64,10 @@ public class ReviewServiceImpl implements ReviewService {
     public ReviewResponseDto update(String id, ReviewRequestDto request) {
         Review review = reviewRepository.findById(id)
                 .orElseThrow(() -> new RecordNotFoundException(ErrorCode.REVIEW_NOT_FOUND.getMessage()));
-        mapper.map(request, review);
-        review.setId(id);
+
+        review.setComment(request.getComment());
+        review.setRating(request.getRating());
+
         Review updatedReview = reviewRepository.save(review);
         return mapper.map(updatedReview, ReviewResponseDto.class);
     }
@@ -75,6 +77,7 @@ public class ReviewServiceImpl implements ReviewService {
         if (!reviewRepository.existsById(id)) {
             throw new RecordNotFoundException(ErrorCode.REVIEW_NOT_FOUND.getMessage());
         }
+
         reviewRepository.deleteById(id);
     }
 
