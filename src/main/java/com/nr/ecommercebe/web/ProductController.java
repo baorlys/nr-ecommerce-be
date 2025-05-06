@@ -38,6 +38,12 @@ public class ProductController {
         return ResponseEntity.ok(product);
     }
 
+    @GetMapping("slug/{slug}")
+    public ResponseEntity<ProductDetailResponseDto> getProductBySlug(@PathVariable String slug) {
+        ProductDetailResponseDto product = productService.getBySlug(slug);
+        return ResponseEntity.ok(product);
+    }
+
 
 
 

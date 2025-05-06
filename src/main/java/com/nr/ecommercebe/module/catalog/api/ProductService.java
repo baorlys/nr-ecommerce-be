@@ -10,5 +10,5 @@ import org.springframework.data.domain.Pageable;
 public interface ProductService extends BaseCrudService<String, ProductRequestDto, ProductDetailResponseDto> {
     Page<ProductResponseDto> getAll(ProductFilter filter, Pageable pageable);
     Page<AdminProductResponseDto> getAllForAdmin(ProductFilter filter, Pageable pageable);
-
+    ProductDetailResponseDto getBySlug(String slug);
 }

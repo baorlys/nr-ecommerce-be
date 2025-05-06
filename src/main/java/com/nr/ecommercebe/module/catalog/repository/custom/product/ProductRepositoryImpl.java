@@ -54,44 +54,12 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
 
     @Override
     public Optional<ProductDetailResponseDto> findByIdWithDto(String id) {
-        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-        CriteriaQuery<ProductDetailResponseDto> query = cb.createQuery(ProductDetailResponseDto.class);
+        return findProductDetailBy("id", id);
+    }
 
-        Root<Product> root = query.from(Product.class);
-        Join<Product, Review> reviewJoin = root.join("reviews", JoinType.LEFT);
-        Join<Product, Category> categoryJoin = root.join("category", JoinType.LEFT);
-
-        query.select(cb.construct(
-                        ProductDetailResponseDto.class,
-                        root.get("id"),
-                        root.get("name"),
-                        root.get("shortDescription"),
-                        root.get("description"),
-                        cb.construct(
-                                CategoryBasicInfoResponseDto.class,
-                                categoryJoin.get("id"),
-                                categoryJoin.get("name"),
-                                categoryJoin.get("slug"),
-                                categoryJoin.get("imageUrl"),
-                                categoryJoin.get("parent").get("id")
-                        ),
-                        cb.avg(reviewJoin.get("rating")),
-                        cb.count(reviewJoin.get("id")),
-                        root.get("isFeatured")
-                ))
-                .where(cb.equal(root.get("id"), id))
-                .groupBy(
-                        root.get("id"),
-                        root.get("name"),
-                        root.get("description"),
-                        categoryJoin.get("id"),
-                        categoryJoin.get("name"),
-                        categoryJoin.get("imageUrl"),
-                        categoryJoin.get("parent").get("id")
-                );
-
-        List<ProductDetailResponseDto> results = entityManager.createQuery(query).getResultList();
-        return results.isEmpty() ? Optional.empty() : Optional.of(results.getFirst());
+    @Override
+    public Optional<ProductDetailResponseDto> findBySlugWithDto(String slug) {
+        return findProductDetailBy("slug", slug);
     }
 
     @Override
@@ -141,7 +109,50 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
         return new PageImpl<>(content, pageable, total);
     }
 
+
+
     // -------------------------- Private Utility Methods --------------------------
+    private Optional<ProductDetailResponseDto> findProductDetailBy(String fieldName, Object value) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<ProductDetailResponseDto> query = cb.createQuery(ProductDetailResponseDto.class);
+
+        Root<Product> root = query.from(Product.class);
+        Join<Product, Review> reviewJoin = root.join("reviews", JoinType.LEFT);
+        Join<Product, Category> categoryJoin = root.join("category", JoinType.LEFT);
+
+        query.select(cb.construct(
+                        ProductDetailResponseDto.class,
+                        root.get("id"),
+                        root.get("name"),
+                        root.get("shortDescription"),
+                        root.get("description"),
+                        cb.construct(
+                                CategoryBasicInfoResponseDto.class,
+                                categoryJoin.get("id"),
+                                categoryJoin.get("name"),
+                                categoryJoin.get("slug"),
+                                categoryJoin.get("imageUrl"),
+                                categoryJoin.get("parent").get("id")
+                        ),
+                        cb.avg(reviewJoin.get("rating")),
+                        cb.count(reviewJoin.get("id")),
+                        root.get("isFeatured")
+                ))
+                .where(cb.equal(root.get(fieldName), value))
+                .groupBy(
+                        root.get("id"),
+                        root.get("name"),
+                        root.get("description"),
+                        categoryJoin.get("id"),
+                        categoryJoin.get("name"),
+                        categoryJoin.get("imageUrl"),
+                        categoryJoin.get("parent").get("id")
+                );
+
+        List<ProductDetailResponseDto> results = entityManager.createQuery(query).getResultList();
+        return results.isEmpty() ? Optional.empty() : Optional.of(results.getFirst());
+    }
+
 
     private List<Predicate> buildPredicates(CriteriaBuilder cb,
                                             Root<Product> root,

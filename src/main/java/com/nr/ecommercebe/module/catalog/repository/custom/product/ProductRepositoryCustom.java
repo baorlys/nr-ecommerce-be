@@ -13,4 +13,5 @@ public interface ProductRepositoryCustom {
     Page<ProductResponseDto> findAllAndFilterWithDto(ProductFilter filter, Pageable pageable);
     Optional<ProductDetailResponseDto> findByIdWithDto(String id);
     Page<AdminProductResponseDto> findAllAndFilterForAdminWithDto(ProductFilter filter, Pageable pageable);
+    Optional<ProductDetailResponseDto> findBySlugWithDto(String slug);
 }

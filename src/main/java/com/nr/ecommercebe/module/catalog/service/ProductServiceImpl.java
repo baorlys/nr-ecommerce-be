@@ -202,8 +202,19 @@ public class ProductServiceImpl implements ProductService {
         return productRepository.findAllAndFilterForAdminWithDto(filter, pageable);
     }
 
+    @Override
+    public ProductDetailResponseDto getBySlug(String slug) {
+        ProductDetailResponseDto prodDto = productRepository.findBySlugWithDto(slug)
+                .orElseThrow(() -> new RecordNotFoundException(ErrorCode.PRODUCT_NOT_FOUND.getMessage()));
 
-
+        List<ProductVariantResponseDto> productVariants =
+                productVariantRepository.findByProductIdAndDeletedFalse(prodDto.getId());
+        List<ProductImageResponseDto> productImages =
+                productImageRepository.findByProductIdAndDeletedFalse(prodDto.getId());
+        prodDto.setVariants(productVariants);
+        prodDto.setImages(productImages);
+        return prodDto;
+    }
 
 
 }
