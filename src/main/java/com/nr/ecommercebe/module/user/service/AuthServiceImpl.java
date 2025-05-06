@@ -1,5 +1,7 @@
 package com.nr.ecommercebe.module.user.service;
 
+import com.nr.ecommercebe.module.user.api.request.UpdateUserInfoRequestDto;
+import com.nr.ecommercebe.module.user.api.request.UpdateUserPasswordRequestDto;
 import com.nr.ecommercebe.shared.exception.ErrorCode;
 import com.nr.ecommercebe.shared.service.CommonExceptionService;
 import com.nr.ecommercebe.module.user.api.*;
@@ -18,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -94,15 +97,46 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public UserResponseDto getCurrentUser(String accessToken) {
+        User user = getUserFromAccessToken(accessToken);
+        return mapper.toDTO(user);
+
+    }
+
+    @Override
+    public UserResponseDto updateUser(UpdateUserInfoRequestDto updateUserInfoRequestDto, String accessToken) {
+        User user = getUserFromAccessToken(accessToken);
+
+        user.setFirstName(updateUserInfoRequestDto.getFirstName());
+        user.setLastName(updateUserInfoRequestDto.getLastName());
+        user.setPhone(updateUserInfoRequestDto.getPhone());
+
+        userRepository.save(user);
+        return mapper.toDTO(user);
+    }
+
+    @Override
+    public void updatePassword(UpdateUserPasswordRequestDto updateUserPasswordRequestDto, String accessToken) {
+        User user = getUserFromAccessToken(accessToken);
+
+        String currentPassword = user.getPasswordHash();
+        String currentPasswordRequest = updateUserPasswordRequestDto.getCurrentPassword();
+        String newPassword = updateUserPasswordRequestDto.getNewPassword();
+
+        if (!passwordEncoder.matches(currentPasswordRequest, currentPassword)) {
+            throw new BadCredentialsException(ErrorCode.PASSWORD_IS_INCORRECT.getMessage());
+        }
+
+        user.setPasswordHash(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+    }
+
+    private User getUserFromAccessToken(String accessToken) {
         if(!jwtService.isTokenValid(accessToken)) {
             throw new JwtException(ErrorCode.JWT_IS_INVALID.getMessage());
         }
 
         String userId = jwtService.getUsername(accessToken);
-        User user = userRepository.findById(userId)
+        return userRepository.findById(userId)
                 .orElseThrow(() -> new JwtException(ErrorCode.USER_NOT_FOUND.getMessage()));
-
-        return mapper.toDTO(user);
-
     }
 }

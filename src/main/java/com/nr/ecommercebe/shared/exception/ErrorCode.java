@@ -34,7 +34,9 @@ public enum ErrorCode {
     JWT_IS_INVALID("jwt.is_invalid", "JWT is invalid",
             "JWT is invalid"),
     UNAUTHORIZED("unauthorized", "Access denied. Invalid or missing token.",
-            "Unauthorized access"), ;
+            "Unauthorized access"),
+    PASSWORD_IS_INCORRECT("password.is.incorrect", "Password is incorrect",
+            "Password is incorrect");
 
 
 

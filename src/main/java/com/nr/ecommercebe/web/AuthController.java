@@ -1,5 +1,7 @@
 package com.nr.ecommercebe.web;
 
+import com.nr.ecommercebe.module.user.api.request.UpdateUserInfoRequestDto;
+import com.nr.ecommercebe.module.user.api.request.UpdateUserPasswordRequestDto;
 import com.nr.ecommercebe.shared.util.CookieUtil;
 import com.nr.ecommercebe.module.user.api.*;
 import com.nr.ecommercebe.module.user.api.request.LoginRequestDto;
@@ -78,6 +80,28 @@ public class AuthController {
         UserResponseDto user = authService.getCurrentUser(accessToken);
         return ResponseEntity.ok(user);
     }
+
+    @PutMapping("/me")
+    public ResponseEntity<UserResponseDto> updateUser(
+            @RequestBody @Valid UpdateUserInfoRequestDto updateUserInfoRequestDto,
+            HttpServletRequest request
+    ) {
+        String accessToken = CookieUtil.getCookieValue(request, CookieUtil.ACCESS_TOKEN_NAME);
+        UserResponseDto updatedUser = authService.updateUser(updateUserInfoRequestDto, accessToken);
+        return ResponseEntity.ok(updatedUser);
+    }
+
+    @PutMapping("/me/password")
+    public ResponseEntity<Void> updatePassword(
+            @RequestBody @Valid UpdateUserPasswordRequestDto updateUserPasswordRequestDto,
+            HttpServletRequest request
+    ) {
+        String accessToken = CookieUtil.getCookieValue(request, CookieUtil.ACCESS_TOKEN_NAME);
+        authService.updatePassword(updateUserPasswordRequestDto, accessToken);
+        return ResponseEntity.noContent().build();
+    }
+
+
 
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(
