@@ -42,6 +42,14 @@ public class SecurityConfig  {
                                 .authenticationEntryPoint(authenticationEntryPoint)
                 )
                 .authorizeHttpRequests(auth -> auth
+                        // API Docs
+                        .requestMatchers(
+                                "/v3/api-docs/**",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html"
+                        ).permitAll()
+
+                        // API
                         .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/v1/media/**").authenticated()
                         .requestMatchers("/api/v1/auth/me").authenticated()

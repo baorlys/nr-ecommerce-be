@@ -7,6 +7,10 @@ import com.nr.ecommercebe.module.catalog.application.dto.response.AdminProductRe
 import com.nr.ecommercebe.module.catalog.application.dto.response.ProductDetailResponseDto;
 import com.nr.ecommercebe.module.catalog.application.service.ProductService;
 import com.nr.ecommercebe.shared.util.URIUtil;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -22,21 +26,23 @@ import java.net.URI;
 @RequestMapping("api/v1/admin/products")
 @AllArgsConstructor
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
+@Tag(name = "Admin - Products", description = "Admin operations for managing products")
 public class ProductAdminController {
     ProductService productService;
 
-    /**
-     * Get paginated list of products for admin with optional filtering.
-     *
-     * @param page    current page number (0-based)
-     * @param size    page size
-     * @param filter  filtering criteria (e.g., by category, name, etc.)
-     * @return        paged list of products wrapped in a success response
-     */
     @GetMapping
+    @Operation(
+            summary = "Get paginated list of products",
+            description = "Returns a paginated list of products for admin with optional filtering"
+    )
     public ResponseEntity<PagedResponseSuccess<AdminProductResponseDto>> getProducts(
+            @Parameter(description = "Page number (0-based)", example = "0")
             @RequestParam(defaultValue = "0") int page,
+
+            @Parameter(description = "Page size", example = "10")
             @RequestParam(defaultValue = "10") int size,
+
+            @Parameter(description = "Filter by product attributes like category or name,... etc.")
             @ModelAttribute ProductFilter filter) {
 
         PageRequest pageRequest = PageRequest.of(page, size);
@@ -44,47 +50,58 @@ public class ProductAdminController {
         return ResponseEntity.ok(new PagedResponseSuccess<>("Products fetched successfully", productPage));
     }
 
-    /**
-     * Create a new product.
-     *
-     * @param request product creation request payload
-     * @return        created product details with 201 Created response
-     */
     @PostMapping
-    public ResponseEntity<ProductDetailResponseDto> createProduct(@Valid @RequestBody ProductRequestDto request) {
+    @Operation(
+            summary = "Create a new product",
+            description = "Adds a new product to the catalog and returns its details",
+            responses = {
+                    @ApiResponse(responseCode = "201", description = "Product created successfully"),
+                    @ApiResponse(responseCode = "400", description = "Invalid request payload")
+            }
+    )
+    public ResponseEntity<ProductDetailResponseDto> createProduct(
+            @Valid @RequestBody ProductRequestDto request) {
         ProductDetailResponseDto response = productService.create(request);
-
         URI location = URIUtil.buildLocationUri("/{id}", response.getId());
         return ResponseEntity.created(location).body(response);
     }
 
-    /**
-     * Update a product by its ID.
-     *
-     * @param id      product ID
-     * @param request update request payload
-     * @return        updated product details
-     */
-    @PostMapping("{id}")
-    public ResponseEntity<ProductDetailResponseDto> updateProduct(@PathVariable String id,
-                                                                  @Valid @RequestBody ProductRequestDto request) {
+    @PutMapping("{id}")
+    @Operation(
+            summary = "Update product",
+            description = "Updates an existing product by its ID",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Product updated successfully"),
+                    @ApiResponse(responseCode = "404", description = "Product not found")
+            }
+    )
+    public ResponseEntity<ProductDetailResponseDto> updateProduct(
+            @Parameter(description = "Product ID", example = "12345")
+            @PathVariable String id,
+
+            @Valid @RequestBody ProductRequestDto request) {
         ProductDetailResponseDto response = productService.update(id, request);
         return ResponseEntity.ok(response);
     }
 
-    /**
-     * Delete a product by its ID.
-     *
-     * @param id product ID to delete
-     * @return   204 No Content response
-     */
     @DeleteMapping("{id}")
-    public ResponseEntity<Void> deleteProduct(@PathVariable String id) {
+    @Operation(
+            summary = "Delete product",
+            description = "Deletes an existing product by its ID",
+            responses = {
+                    @ApiResponse(responseCode = "204", description = "Product deleted successfully"),
+                    @ApiResponse(responseCode = "404", description = "Product not found")
+            }
+    )
+    public ResponseEntity<Void> deleteProduct(
+            @Parameter(description = "Product ID", example = "12345")
+            @PathVariable String id) {
         productService.delete(id);
         return ResponseEntity.noContent().build();
     }
-
-
-
-
 }
+
+
+
+
+
