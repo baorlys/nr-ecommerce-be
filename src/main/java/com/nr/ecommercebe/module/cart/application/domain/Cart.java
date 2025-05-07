@@ -1,7 +1,7 @@
 package com.nr.ecommercebe.module.cart.application.domain;
 
-import com.nr.ecommercebe.module.user.model.User;
-import com.nr.ecommercebe.shared.model.BaseEntity;
+import com.nr.ecommercebe.module.user.application.domain.User;
+import com.nr.ecommercebe.shared.domain.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;

@@ -1,0 +1,51 @@
+package com.nr.ecommercebe.module.catalog.web;
+
+import com.nr.ecommercebe.module.catalog.application.dto.request.ProductFilter;
+import com.nr.ecommercebe.shared.dto.PagedResponseSuccess;
+import com.nr.ecommercebe.module.catalog.application.dto.response.ProductDetailResponseDto;
+import com.nr.ecommercebe.module.catalog.application.dto.response.ProductResponseDto;
+import com.nr.ecommercebe.module.catalog.application.service.ProductService;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+
+@RestController
+@RequestMapping("api/v1/products")
+@RequiredArgsConstructor
+@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
+public class ProductController {
+    ProductService productService;
+
+    @GetMapping
+    public ResponseEntity<PagedResponseSuccess<ProductResponseDto>> getProducts(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @ModelAttribute ProductFilter filter) {
+
+        PageRequest pageRequest = PageRequest.of(page, size);
+        Page<ProductResponseDto> productPage = productService.getAll(filter, pageRequest);
+        return ResponseEntity.ok(new PagedResponseSuccess<>("Products fetched successfully",productPage));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ProductDetailResponseDto> getProductById(@PathVariable String id) {
+        ProductDetailResponseDto product = productService.getById(id);
+        return ResponseEntity.ok(product);
+    }
+
+    @GetMapping("slug/{slug}")
+    public ResponseEntity<ProductDetailResponseDto> getProductBySlug(@PathVariable String slug) {
+        ProductDetailResponseDto product = productService.getBySlug(slug);
+        return ResponseEntity.ok(product);
+    }
+
+
+
+
+
+}

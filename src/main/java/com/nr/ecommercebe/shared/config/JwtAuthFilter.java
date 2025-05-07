@@ -1,7 +1,7 @@
 package com.nr.ecommercebe.shared.config;
 
 import com.nr.ecommercebe.shared.util.CookieUtil;
-import com.nr.ecommercebe.module.user.service.JwtService;
+import com.nr.ecommercebe.module.user.application.service.authentication.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

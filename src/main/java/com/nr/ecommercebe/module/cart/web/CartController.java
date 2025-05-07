@@ -3,7 +3,7 @@ package com.nr.ecommercebe.module.cart.web;
 import com.nr.ecommercebe.module.cart.application.domain.CartItem;
 import com.nr.ecommercebe.module.cart.application.dto.request.CartItemRequestDto;
 import com.nr.ecommercebe.module.cart.application.service.CartService;
-import com.nr.ecommercebe.module.user.api.AuthService;
+import com.nr.ecommercebe.module.user.application.service.authentication.AuthService;
 import com.nr.ecommercebe.shared.util.CookieUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AccessLevel;

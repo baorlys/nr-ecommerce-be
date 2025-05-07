@@ -1,7 +1,7 @@
 package com.nr.ecommercebe.shared.config;
 
 import com.nr.ecommercebe.shared.exception.CustomAuthenticationEntryPoint;
-import com.nr.ecommercebe.module.user.service.CustomUserDetailsService;
+import com.nr.ecommercebe.module.user.application.service.authentication.CustomUserDetailsService;
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;

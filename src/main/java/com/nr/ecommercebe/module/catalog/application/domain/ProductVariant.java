@@ -1,4 +1,4 @@
-package com.nr.ecommercebe.module.cart.application.domain;
+package com.nr.ecommercebe.module.catalog.application.domain;
 
 import com.nr.ecommercebe.shared.domain.BaseEntity;
 import jakarta.persistence.*;
@@ -8,30 +8,27 @@ import lombok.experimental.SuperBuilder;
 
 import java.math.BigDecimal;
 
-@Entity(name = "cart_items")
+@Entity(name = "product_variants")
 @Getter
 @Setter
-@EqualsAndHashCode(callSuper = true, exclude = {"cart"})
+@ToString(exclude = {"product"})
+@EqualsAndHashCode(callSuper = true, exclude = {"product"})
 @SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class CartItem extends BaseEntity {
-    @Column(nullable = false)
-    String variantId;
+public class ProductVariant extends BaseEntity {
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(nullable = false)
+    Product product;
 
     @Column(nullable = false)
     String name;
 
-    String imageUrl;
-
-    @Column(nullable = false)
-    int quantity;
-
     @Column(precision = 20, scale = 2, nullable = false)
     BigDecimal price;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Cart cart;
+    @Column(nullable = false, columnDefinition = "integer default 0")
+    Integer stockQuantity;
 
 }
