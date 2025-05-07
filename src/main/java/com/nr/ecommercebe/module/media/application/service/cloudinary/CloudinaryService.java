@@ -43,7 +43,7 @@ public class CloudinaryService implements MediaService {
         }
     }
 
-    private String extractPublicIdFromUrl(String imageUrl) throws IOException {
+    public String extractPublicIdFromUrl(String imageUrl) throws IOException {
         URI uri = URI.create(imageUrl);
         URL url = uri.toURL();
         String path = url.getPath();

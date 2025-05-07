@@ -37,9 +37,10 @@ public class CookieUtil {
     }
 
     public static String getCookieValue(HttpServletRequest request, String name) {
-        if (request.getCookies() == null) return null;
+        Cookie[] cookies = request.getCookies();
+        if (cookies == null) return null;
 
-        return Arrays.stream(request.getCookies())
+        return Arrays.stream(cookies)
                 .filter(cookie -> cookie.getName().equals(name))
                 .findFirst()
                 .map(Cookie::getValue)

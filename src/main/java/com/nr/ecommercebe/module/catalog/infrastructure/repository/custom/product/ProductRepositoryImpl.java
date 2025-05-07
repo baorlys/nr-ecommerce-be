@@ -155,13 +155,11 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                         root.get(BaseEntityField.ID.toString()),
                         root.get(ProductField.NAME.toString()),
                         root.get(ProductField.DESCRIPTION.toString()),
-                        root.get(ProductField.SHORT_DESCRIPTION.toString()),
                         categoryJoin.get(BaseEntityField.ID.toString()),
                         categoryJoin.get(CategoryField.NAME.toString()),
                         categoryJoin.get(CategoryField.SLUG.toString()),
                         categoryJoin.get(CategoryField.IMAGE_URL.toString()),
-                        categoryJoin.get(CategoryField.PARENT.toString()).get(BaseEntityField.ID.toString()),
-                        root.get(ProductField.IS_FEATURED.toString())
+                        categoryJoin.get(CategoryField.PARENT.toString()).get(BaseEntityField.ID.toString())
                 );
 
         List<ProductDetailResponseDto> results = entityManager.createQuery(query).getResultList();

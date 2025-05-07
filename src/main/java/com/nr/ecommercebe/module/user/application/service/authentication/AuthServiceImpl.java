@@ -3,13 +3,14 @@ package com.nr.ecommercebe.module.user.application.service.authentication;
 import com.nr.ecommercebe.module.user.application.dto.request.UpdateUserInfoRequestDto;
 import com.nr.ecommercebe.module.user.application.dto.request.UpdateUserPasswordRequestDto;
 import com.nr.ecommercebe.module.user.application.mapper.UserMapper;
+import com.nr.ecommercebe.module.user.application.service.cache.RoleCacheService;
+import com.nr.ecommercebe.module.user.application.service.cache.UserCacheService;
 import com.nr.ecommercebe.shared.exception.ErrorCode;
 import com.nr.ecommercebe.shared.service.CommonExceptionService;
 import com.nr.ecommercebe.module.user.application.dto.request.LoginRequestDto;
 import com.nr.ecommercebe.module.user.application.dto.request.RegisterRequestDto;
 import com.nr.ecommercebe.module.user.application.dto.response.LoginResponseDto;
 import com.nr.ecommercebe.module.user.application.dto.response.UserResponseDto;
-import com.nr.ecommercebe.module.user.application.initializer.RoleCache;
 import com.nr.ecommercebe.module.user.application.domain.Role;
 import com.nr.ecommercebe.module.user.application.domain.RoleName;
 import com.nr.ecommercebe.module.user.application.domain.TokenType;
@@ -35,7 +36,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class AuthServiceImpl implements AuthService {
     UserRepository userRepository;
 
-    RoleCache roleCache;
+    RoleCacheService roleCacheService;
+    UserCacheService userCacheService;
     AuthenticationManager authManager;
     PasswordEncoder passwordEncoder;
     JwtService jwtService;
@@ -52,6 +54,7 @@ public class AuthServiceImpl implements AuthService {
         String refreshToken = jwtService.generateRefreshToken(userDetails);
 
         UserResponseDto userResponse = mapper.toDTO(userDetails.user());
+        userCacheService.cacheUser(userResponse);
 
         return LoginResponseDto.builder()
                 .accessToken(accessToken)
@@ -68,7 +71,7 @@ public class AuthServiceImpl implements AuthService {
 
         User user = mapper.toEntity(registerRequestDto);
         user.setPasswordHash(passwordEncoder.encode(registerRequestDto.getPassword()));
-        user.setRole(roleCache.getUserRole());
+        user.setRole(roleCacheService.getRole(RoleName.USER));
 
         return userRepository.save(user).getId();
     }
@@ -81,7 +84,7 @@ public class AuthServiceImpl implements AuthService {
 
         String userId = jwtService.getUsername(refreshToken);
         String roleName = jwtService.getRole(refreshToken).replace("ROLE_", "");
-        Role role = roleCache.getRoleByName(RoleName.valueOf(roleName));
+        Role role = roleCacheService.getRole(RoleName.valueOf(roleName));
 
         User user = new User();
         user.setId(userId);
@@ -91,27 +94,43 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public void logout(String token) {
-        // Implement blacklist token logic
+    public void logout(String refreshToken) {
+        String userId = getUserIdFromToken(refreshToken);
+        userCacheService.evictUserById(userId);
     }
 
     @Override
     public UserResponseDto getCurrentUser(String accessToken) {
-        User user = getUserFromAccessToken(accessToken);
-        return mapper.toDTO(user);
+        String userId = getUserIdFromToken(accessToken);
 
+        UserResponseDto userInCache = userCacheService.getCachedUserById(userId);
+        if (userInCache != null) {
+            return userInCache;
+        }
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new JwtException(ErrorCode.USER_NOT_FOUND.getMessage()));
+        UserResponseDto userResponse = mapper.toDTO(user);
+        userCacheService.cacheUser(userResponse);
+        return userResponse;
     }
 
     @Override
     public UserResponseDto updateUser(UpdateUserInfoRequestDto updateUserInfoRequestDto, String accessToken) {
         User user = getUserFromAccessToken(accessToken);
 
+        userCacheService.evictUserById(user.getId());
+
         user.setFirstName(updateUserInfoRequestDto.getFirstName());
         user.setLastName(updateUserInfoRequestDto.getLastName());
         user.setPhone(updateUserInfoRequestDto.getPhone());
 
         userRepository.save(user);
-        return mapper.toDTO(user);
+
+        UserResponseDto userResponse = mapper.toDTO(user);
+
+        userCacheService.cacheUser(userResponse);
+        return userResponse;
     }
 
     @Override
@@ -132,17 +151,17 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public User getUserFromAccessToken(String accessToken) {
-        String userId = getUserIdFromAccessToken(accessToken);
+        String userId = getUserIdFromToken(accessToken);
         return userRepository.findById(userId)
                 .orElseThrow(() -> new JwtException(ErrorCode.USER_NOT_FOUND.getMessage()));
     }
 
     @Override
-    public String getUserIdFromAccessToken(String accessToken) {
-        if(!jwtService.isTokenValid(accessToken)) {
+    public String getUserIdFromToken(String token) {
+        if(!jwtService.isTokenValid(token)) {
             throw new JwtException(ErrorCode.JWT_IS_INVALID.getMessage());
         }
 
-        return jwtService.getUsername(accessToken);
+        return jwtService.getUsername(token);
     }
 }

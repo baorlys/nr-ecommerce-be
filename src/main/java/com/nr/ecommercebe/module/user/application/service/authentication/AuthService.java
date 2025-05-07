@@ -15,7 +15,7 @@ public interface AuthService {
 
     String refreshToken(String refreshToken);
 
-    void logout(String token);
+    void logout(String refreshToken);
 
     UserResponseDto getCurrentUser(String accessToken);
 
@@ -25,5 +25,5 @@ public interface AuthService {
 
     User getUserFromAccessToken(String accessToken);
 
-    String getUserIdFromAccessToken(String accessToken);
+    String getUserIdFromToken(String accessToken);
 }

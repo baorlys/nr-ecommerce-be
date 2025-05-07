@@ -43,4 +43,8 @@ public class Category extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     StorageType storageType;
+
+    public Category(String id) {
+        this.id = id;
+    }
 }

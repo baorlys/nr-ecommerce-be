@@ -2,7 +2,7 @@ package com.nr.ecommercebe.module.user.application.service.manager;
 
 import com.nr.ecommercebe.module.user.application.mapper.UserMapper;
 import com.nr.ecommercebe.module.user.application.dto.response.UserResponseDto;
-import com.nr.ecommercebe.module.user.application.initializer.RoleCache;
+import com.nr.ecommercebe.module.user.application.service.cache.RoleCacheService;
 import com.nr.ecommercebe.module.user.application.domain.User;
 import com.nr.ecommercebe.module.user.infrastructure.repository.UserRepository;
 import com.nr.ecommercebe.shared.exception.ErrorCode;
@@ -21,7 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class UserServiceImpl implements UserService {
     UserRepository userRepository;
-    RoleCache roleCache;
+    RoleCacheService roleCacheService;
     UserMapper mapper;
 
     @Transactional(readOnly = true)

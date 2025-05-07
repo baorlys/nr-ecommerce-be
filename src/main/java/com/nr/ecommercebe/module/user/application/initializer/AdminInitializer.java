@@ -1,6 +1,8 @@
 package com.nr.ecommercebe.module.user.application.initializer;
 
+import com.nr.ecommercebe.module.user.application.domain.RoleName;
 import com.nr.ecommercebe.module.user.application.domain.User;
+import com.nr.ecommercebe.module.user.application.service.cache.RoleCacheService;
 import com.nr.ecommercebe.module.user.infrastructure.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,7 +18,7 @@ import org.springframework.stereotype.Component;
 public class AdminInitializer implements CommandLineRunner {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final RoleCache roleCache;
+    private final RoleCacheService roleCacheService;
 
     @Value("${admin.email}")
     private String adminEmail;
@@ -35,7 +37,7 @@ public class AdminInitializer implements CommandLineRunner {
                     .firstName(adminFirstName)
                     .lastName(adminLastName)
                     .passwordHash(passwordEncoder.encode(adminPassword))
-                    .role(roleCache.getAdminRole())
+                    .role(roleCacheService.getRole(RoleName.ADMIN))
                     .build();
             userRepository.save(admin);
             log.info("Admin user created");

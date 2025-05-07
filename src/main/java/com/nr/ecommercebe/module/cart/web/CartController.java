@@ -25,7 +25,7 @@ public class CartController {
     @PostMapping
     public ResponseEntity<Void> addToCart(HttpServletRequest request, @RequestBody CartItemRequestDto item) {
         String accessToken = CookieUtil.getCookieValue(request, CookieUtil.ACCESS_TOKEN_NAME);
-        String userId = authService.getUserIdFromAccessToken(accessToken);
+        String userId = authService.getUserIdFromToken(accessToken);
         cartService.addToCart(userId, item);
         return ResponseEntity.ok().build();
     }
@@ -33,14 +33,14 @@ public class CartController {
     @GetMapping
     public ResponseEntity<List<CartItem>> getCart(HttpServletRequest request) {
         String accessToken = CookieUtil.getCookieValue(request, CookieUtil.ACCESS_TOKEN_NAME);
-        String userId = authService.getUserIdFromAccessToken(accessToken);
+        String userId = authService.getUserIdFromToken(accessToken);
         return ResponseEntity.ok(cartService.getCart(userId));
     }
 
     @DeleteMapping("/{itemId}")
     public ResponseEntity<Void> removeFromCart(HttpServletRequest request, @PathVariable String itemId) {
         String accessToken = CookieUtil.getCookieValue(request, CookieUtil.ACCESS_TOKEN_NAME);
-        String userId = authService.getUserIdFromAccessToken(accessToken);
+        String userId = authService.getUserIdFromToken(accessToken);
         cartService.removeFromCart(userId, itemId);
         return ResponseEntity.noContent().build();
     }
@@ -48,7 +48,7 @@ public class CartController {
     @DeleteMapping
     public ResponseEntity<Void> clearCart(HttpServletRequest request) {
         String accessToken = CookieUtil.getCookieValue(request, CookieUtil.ACCESS_TOKEN_NAME);
-        String userId = authService.getUserIdFromAccessToken(accessToken);
+        String userId = authService.getUserIdFromToken(accessToken);
         cartService.clearCart(userId);
         return ResponseEntity.noContent().build();
     }

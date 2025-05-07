@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
 
 @Data
 @AllArgsConstructor
@@ -16,7 +15,7 @@ public class UserResponseDto {
     String lastName;
     String phone;
     RoleResponseDto role;
-    LocalDate createdOn;
-    LocalDate updatedOn;
+    String createdOn;
+    String updatedOn;
 }
 
