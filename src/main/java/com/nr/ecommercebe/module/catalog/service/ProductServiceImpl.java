@@ -240,5 +240,20 @@ public class ProductServiceImpl implements ProductService {
                 .orElseThrow(() -> new RecordNotFoundException(ErrorCode.PRODUCT_VARIANT_NOT_FOUND.getMessage()));
     }
 
+    @Override
+    public ProductVariant getProductVariantByIdWithLock(String variantId) {
+        return productVariantRepository.findByIdWithLock(variantId)
+                .orElseThrow(() -> new RecordNotFoundException(ErrorCode.PRODUCT_VARIANT_NOT_FOUND.getMessage()));
+    }
+
+    @Override
+    public void updateProductVariantStock(ProductVariant productVariant) {
+        ProductVariant existingVariant = productVariantRepository.findById(productVariant.getId())
+                .orElseThrow(() -> new RecordNotFoundException(ErrorCode.PRODUCT_VARIANT_NOT_FOUND.getMessage()));
+
+        existingVariant.setStockQuantity(productVariant.getStockQuantity());
+        productVariantRepository.save(existingVariant);
+    }
+
 
 }

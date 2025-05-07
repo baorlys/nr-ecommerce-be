@@ -13,4 +13,6 @@ public interface ProductService extends BaseCrudService<String, ProductRequestDt
     Page<AdminProductResponseDto> getAllForAdmin(ProductFilter filter, Pageable pageable);
     ProductDetailResponseDto getBySlug(String slug);
     ProductVariant getProductVariantById(String variantId);
+    ProductVariant getProductVariantByIdWithLock(String variantId);
+    void updateProductVariantStock(ProductVariant productVariant);
 }
