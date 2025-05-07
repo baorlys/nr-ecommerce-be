@@ -21,8 +21,10 @@ public class CategorySpecs {
                 return cb.conjunction(); // No filter applied
             }
             return cb.or(
-                    cb.like(cb.lower(root.get(CategoryField.NAME.toString())), "%" + searchTerm.toLowerCase() + "%"),
-                    cb.like(cb.lower(root.get(CategoryField.SLUG.toString())), "%" + searchTerm.toLowerCase() + "%"));
+                    cb.like(cb.lower(root.get(CategoryField.NAME.toString())), "%" +
+                            searchTerm.toLowerCase() + "%"),
+                    cb.like(cb.lower(root.get(CategoryField.SLUG.toString())), "%" +
+                            searchTerm.toLowerCase().replace(" ","-") + "%"));
         };
     }
 
