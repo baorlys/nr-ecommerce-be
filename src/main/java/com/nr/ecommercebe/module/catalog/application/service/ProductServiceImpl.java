@@ -25,6 +25,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -50,11 +51,13 @@ public class ProductServiceImpl implements ProductService {
         product.setSlug(SlugUtil.generateSlug(request.getName()));
 
         Product createdProduct = productRepository.save(product);
+        log.info("Product created with ID: {} at {}", createdProduct.getId(), LocalDateTime.now());
 
         Set<ProductImage> productImages = mapper.mapImages(request.getImages(), createdProduct);
         Set<ProductVariant> productVariants = mapper.mapVariants(request.getVariants(), createdProduct);
 
         productImageRepository.saveAll(productImages);
+        log.info("Product images created for product id: {} at {}", createdProduct.getId(), LocalDateTime.now());
         productVariantRepository.saveAll(productVariants);
 
         return mapper.toDto(createdProduct);
@@ -65,7 +68,7 @@ public class ProductServiceImpl implements ProductService {
     public ProductDetailResponseDto update(String id, ProductRequestDto request) {
         Product existingProduct = productRepository.findById(id)
                 .orElseThrow(() -> {
-                    log.error(ErrorCode.PRODUCT_NOT_FOUND.getDefaultMessage(id));
+                    log.error(ErrorCode.PRODUCT_NOT_FOUND.getSystemMessage(id));
                     return new RecordNotFoundException(ErrorCode.PRODUCT_NOT_FOUND.getMessage());
                 });
 
@@ -145,7 +148,7 @@ public class ProductServiceImpl implements ProductService {
     public void delete(String id) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> {
-                    log.error(ErrorCode.PRODUCT_NOT_FOUND.getDefaultMessage(id));
+                    log.error(ErrorCode.PRODUCT_NOT_FOUND.getSystemMessage(id));
                     return new RecordNotFoundException(ErrorCode.PRODUCT_NOT_FOUND.getMessage());
                 });
 

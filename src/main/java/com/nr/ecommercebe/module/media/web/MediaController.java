@@ -27,7 +27,7 @@ public class MediaController {
     MediaServiceContext mediaServiceContext;
     ImageDeletePublisher imageDeletePublisher;
 
-    @PostMapping(value = "/upload",
+    @PostMapping(
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(
@@ -46,7 +46,7 @@ public class MediaController {
         return ResponseEntity.ok(imgUrl);
     }
 
-    @DeleteMapping
+    @DeleteMapping("/{imageUrl}")
     @Operation(
             summary = "Delete image",
             description = "Deletes an image by its URL using messaging queue",
@@ -57,8 +57,8 @@ public class MediaController {
     )
     public ResponseEntity<Void> delete(
             @Parameter(description = "URL of the image to delete", required = true)
-            @RequestParam("imgUrl") String imgUrl) {
-        imageDeletePublisher.publish(imgUrl);
+            @PathVariable String imageUrl) {
+        imageDeletePublisher.publish(imageUrl);
         return ResponseEntity.noContent().build();
     }
 }

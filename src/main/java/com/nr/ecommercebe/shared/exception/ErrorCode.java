@@ -19,6 +19,8 @@ public enum ErrorCode {
             "Cart with ID%s not found" ),
     USER_NOT_FOUND("user.not.found", "User not found",
             "User with ID%s not found" ),
+    ROLE_NOT_FOUND("role.not.found", "Role not found",
+            "Role with Name%s not found" ),
     CATEGORY_NAME_ALREADY_EXISTS("category.name.already.exists", "Category name already exists",
             "Category name %s already exists"),
     PRODUCT_NAME_ALREADY_EXISTS("product.name.already.exists", "Product name already exists",
@@ -44,15 +46,15 @@ public enum ErrorCode {
 
     private final String code;
     private final String message;
-    private final String defaultMessage;
+    private final String systemMessage;
 
-    ErrorCode(String code, String message, String defaultMessage) {
+    ErrorCode(String code, String message, String systemMessage) {
         this.code = code;
         this.message = message;
-        this.defaultMessage = defaultMessage;
+        this.systemMessage = systemMessage;
     }
 
-    public String getDefaultMessage(String ... args) {
-        return String.format(defaultMessage, (Object[]) args);
+    public String getSystemMessage(String ... args) {
+        return String.format(systemMessage, (Object[]) args);
     }
 }

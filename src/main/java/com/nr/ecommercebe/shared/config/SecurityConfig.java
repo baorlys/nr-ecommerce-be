@@ -1,11 +1,15 @@
 package com.nr.ecommercebe.shared.config;
 
+import com.nr.ecommercebe.module.user.application.domain.RoleName;
+import com.nr.ecommercebe.shared.constants.PrivateApi;
+import com.nr.ecommercebe.shared.constants.PublicApi;
 import com.nr.ecommercebe.shared.exception.CustomAuthenticationEntryPoint;
 import com.nr.ecommercebe.module.user.application.service.authentication.CustomUserDetailsService;
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -44,17 +48,17 @@ public class SecurityConfig  {
                 .authorizeHttpRequests(auth -> auth
                         // API Docs
                         .requestMatchers(
-                                "/v3/api-docs/**",
-                                "/v3/api-docs.yaml",
-                                "/swagger-ui/**",
-                                "/swagger-ui.html"
+                                PublicApi.API_DOCS,
+                                PublicApi.API_DOCS_YAML_FILE,
+                                PublicApi.API_DOCS_UI,
+                                PublicApi.API_DOCS_UI_HTML
                         ).permitAll()
 
                         // API
-                        .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/api/v1/media/**").authenticated()
-                        .requestMatchers("/api/v1/auth/me").authenticated()
-                        .requestMatchers("/api/v1/**").permitAll()
+                        .requestMatchers(PrivateApi.API_ADMIN).hasRole(RoleName.ADMIN.name())
+                        .requestMatchers(PrivateApi.API_MEDIA).authenticated()
+                        .requestMatchers(PrivateApi.API_CURRENT_USER).authenticated()
+                        .requestMatchers(PublicApi.OTHER_API).permitAll()
 
                 )
                 .userDetailsService(userDetailsService)
@@ -63,12 +67,12 @@ public class SecurityConfig  {
     }
 
     @Bean
-    public WebMvcConfigurer corsConfigurer() {
+    public WebMvcConfigurer corsConfigurer(@Value("${app.frontend.url}") String appFrontendUrl) {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(@NonNull CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins("http://localhost:5173")
+                        .allowedOrigins(appFrontendUrl)
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*")
                         .allowCredentials(true);

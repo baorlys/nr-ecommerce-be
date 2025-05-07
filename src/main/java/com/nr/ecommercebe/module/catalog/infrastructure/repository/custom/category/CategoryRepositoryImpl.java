@@ -22,7 +22,10 @@ public class CategoryRepositoryImpl implements CategoryRepositoryCustom {
         CriteriaQuery<Category> query = cb.createQuery(Category.class);
         Root<Category> root = query.from(Category.class);
 
-        query.select(root).where(cb.isNull(root.get("parent")));
+        // Join fetch subcategories
+        root.fetch("subCategories", JoinType.LEFT);
+
+        query.select(root).where(cb.isNull(root.get("parent"))).distinct(true);
 
         List<Category> topCategories = entityManager.createQuery(query).getResultList();
 
@@ -30,6 +33,7 @@ public class CategoryRepositoryImpl implements CategoryRepositoryCustom {
                 .map(this::mapCategoryWithChildren)
                 .toList();
     }
+
 
     private CategoryResponseDto mapCategoryWithChildren(Category category) {
         CategoryResponseDto[] subCategoriesDto = category.getSubCategories().stream()

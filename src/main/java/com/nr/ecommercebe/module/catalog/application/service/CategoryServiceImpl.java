@@ -22,6 +22,8 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
@@ -44,6 +46,7 @@ public class CategoryServiceImpl implements CategoryService {
         category.setSlug(SlugUtil.generateSlug(category.getName()));
 
         Category savedCategory = categoryRepository.save(category);
+        log.info("Category created with id: {} at {}", savedCategory.getId(), LocalDateTime.now());
         return mapper.toResponseDto(savedCategory);
     }
 
@@ -51,7 +54,7 @@ public class CategoryServiceImpl implements CategoryService {
     public CategoryResponseDto update(String id, CategoryRequestDto request) {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> {
-                    log.error(ErrorCode.CATEGORY_NOT_FOUND.getDefaultMessage(id));
+                    log.error(ErrorCode.CATEGORY_NOT_FOUND.getSystemMessage(id));
                     return new RecordNotFoundException(ErrorCode.CATEGORY_NOT_FOUND.getMessage());
                 });
         if (categoryRepository.existsByNameAndIdIsNotAndDeletedIsFalse(request.getName(), id)) {
@@ -66,6 +69,7 @@ public class CategoryServiceImpl implements CategoryService {
         category.setImageUrl(request.getImageUrl());
 
         Category updatedCategory = categoryRepository.save(category);
+        log.info("Category updated with id: {} at {}", updatedCategory.getId(), LocalDateTime.now());
 
         return mapper.toResponseDto(updatedCategory);
 
@@ -75,7 +79,7 @@ public class CategoryServiceImpl implements CategoryService {
     public void delete(String id) {
         Category category = categoryRepository.findByIdAndDeletedIsFalse(id)
                 .orElseThrow(() -> {
-                    log.error(ErrorCode.CATEGORY_NOT_FOUND.getDefaultMessage(id));
+                    log.error(ErrorCode.CATEGORY_NOT_FOUND.getSystemMessage(id));
                     return new RecordNotFoundException(ErrorCode.CATEGORY_NOT_FOUND.getMessage());
                 });
 
@@ -92,6 +96,7 @@ public class CategoryServiceImpl implements CategoryService {
         });
 
         categoryRepository.delete(category);
+        log.info("Category deleted with id: {} at {}", category.getId(), LocalDateTime.now());
     }
 
     @Transactional(readOnly = true)
