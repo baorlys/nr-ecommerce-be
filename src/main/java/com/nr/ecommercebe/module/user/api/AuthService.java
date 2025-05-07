@@ -6,6 +6,7 @@ import com.nr.ecommercebe.module.user.api.request.UpdateUserInfoRequestDto;
 import com.nr.ecommercebe.module.user.api.request.UpdateUserPasswordRequestDto;
 import com.nr.ecommercebe.module.user.api.response.LoginResponseDto;
 import com.nr.ecommercebe.module.user.api.response.UserResponseDto;
+import com.nr.ecommercebe.module.user.model.User;
 
 public interface AuthService {
     LoginResponseDto login(LoginRequestDto loginRequestDto);
@@ -21,4 +22,8 @@ public interface AuthService {
     UserResponseDto updateUser(UpdateUserInfoRequestDto updateUserInfoRequestDto, String accessToken);
 
     void updatePassword(UpdateUserPasswordRequestDto updateUserPasswordRequestDto, String accessToken);
+
+    User getUserFromAccessToken(String accessToken);
+
+    String getUserIdFromAccessToken(String accessToken);
 }
