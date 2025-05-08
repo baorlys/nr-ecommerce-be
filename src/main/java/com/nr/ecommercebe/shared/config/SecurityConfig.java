@@ -3,7 +3,7 @@ package com.nr.ecommercebe.shared.config;
 import com.nr.ecommercebe.module.user.application.domain.RoleName;
 import com.nr.ecommercebe.shared.constants.PrivateApi;
 import com.nr.ecommercebe.shared.constants.PublicApi;
-import com.nr.ecommercebe.shared.exception.CustomAuthenticationEntryPoint;
+import com.nr.ecommercebe.shared.exception.handler.CustomAuthenticationEntryPoint;
 import com.nr.ecommercebe.module.user.application.service.authentication.CustomUserDetailsService;
 import lombok.AccessLevel;
 import lombok.NonNull;
