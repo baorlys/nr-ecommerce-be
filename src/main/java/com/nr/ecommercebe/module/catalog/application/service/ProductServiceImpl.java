@@ -77,11 +77,13 @@ public class ProductServiceImpl implements ProductService {
         existingProduct.setDescription(request.getDescription());
         existingProduct.setShortDescription(request.getShortDescription());
         existingProduct.getCategory().setId(request.getCategoryId());
+        existingProduct.setIsFeatured(request.getIsFeatured());
 
         List<ProductVariantResponseDto> variantResponses = updateVariants(existingProduct, request.getVariants());
         List<ProductImageResponseDto> imageResponses = updateImages(existingProduct, request.getImages());
 
         Product updatedProduct = productRepository.save(existingProduct);
+        log.info("Product updated with ID: {} at {}", updatedProduct.getId(), LocalDateTime.now());
 
         ProductDetailResponseDto productResponse = mapper.toDto(updatedProduct);
         productResponse.setVariants(variantResponses);
@@ -103,6 +105,7 @@ public class ProductServiceImpl implements ProductService {
             variant = mapper.toVariantEntity(req);
             variant.setProduct(product);
             ProductVariant updatedOrCreatedVariant = productVariantRepository.save(variant);
+            log.info("Variant updated with ID: {} at {}", updatedOrCreatedVariant.getId(), LocalDateTime.now());
             incomingIds.add(updatedOrCreatedVariant.getId());
             result.add(mapper.toVariantResponseDto(updatedOrCreatedVariant));
         }
@@ -110,6 +113,7 @@ public class ProductServiceImpl implements ProductService {
         for (ProductVariant variant : existing.values()) {
             if (!incomingIds.contains(variant.getId())) {
                 variant.setDeleted(true);
+                log.info("Variant deleted with ID: {} at {}", variant.getId(), LocalDateTime.now());
                 productVariantRepository.save(variant);
             }
         }
@@ -129,6 +133,7 @@ public class ProductServiceImpl implements ProductService {
             ProductImage image = mapper.toImageEntity(req);
             image.setProduct(product);
             ProductImage updatedOrCreatedImage = productImageRepository.save(image);
+            log.info("Image updated with ID: {} at {}", updatedOrCreatedImage.getId(), LocalDateTime.now());
             incomingIds.add(updatedOrCreatedImage.getId());
             result.add(mapper.toImageResponseDto(updatedOrCreatedImage));
         }
@@ -138,6 +143,7 @@ public class ProductServiceImpl implements ProductService {
                 imageDeletePublisher.publish(img.getImageUrl());
                 product.getImages().remove(img);
                 productImageRepository.delete(img);
+                log.info("Image deleted with ID: {} at {}", img.getId(), LocalDateTime.now());
             }
         }
 
@@ -156,6 +162,7 @@ public class ProductServiceImpl implements ProductService {
             product.getImages().forEach(image -> {
                 productImageRepository.delete(image);
                 imageDeletePublisher.publish(image.getImageUrl());
+                log.info("Image {} publish to queue to delete ", image.getImageUrl());
             });
         }
         if (!product.getVariants().isEmpty()) {
@@ -167,6 +174,7 @@ public class ProductServiceImpl implements ProductService {
 
         product.setDeleted(true);
         productRepository.save(product);
+        log.info("Product deleted with ID: {} at {}", product.getId(), LocalDateTime.now());
     }
 
     @Transactional(readOnly = true)

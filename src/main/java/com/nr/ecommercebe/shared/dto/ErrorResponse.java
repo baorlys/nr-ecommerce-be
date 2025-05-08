@@ -1,4 +1,4 @@
-package com.nr.ecommercebe.shared.exception;
+package com.nr.ecommercebe.shared.dto;
 
 import java.time.LocalDateTime;
 

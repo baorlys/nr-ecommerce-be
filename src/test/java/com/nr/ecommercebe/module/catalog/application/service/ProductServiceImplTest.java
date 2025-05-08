@@ -63,7 +63,7 @@ class ProductServiceImplTest {
                 .description("Test Description")
                 .shortDescription("Test Short Description")
                 .categoryId("cat1")
-                .images(Set.of(new ProductImageRequestDto("img1", "url1", "alt1", true, 0)))
+                .images(Set.of(new ProductImageRequestDto("img1", "url1", "alt1", true,"CLOUDINARY", 0)))
                 .variants(Set.of(new ProductVariantRequestDto("var1", "var1Name", BigDecimal.valueOf(100.0), 10)))
                 .build();
 

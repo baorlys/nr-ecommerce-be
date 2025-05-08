@@ -23,5 +23,7 @@ public class ProductImageRequestDto {
 
     Boolean isPrimary;
 
+    String storageType;
+
     Integer sortOrder;
 }

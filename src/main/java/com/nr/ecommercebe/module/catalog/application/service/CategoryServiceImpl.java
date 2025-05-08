@@ -90,9 +90,9 @@ public class CategoryServiceImpl implements CategoryService {
         });
 
         List<Category> subCategories = category.getSubCategories();
-        subCategories.forEach( childCategory -> {
-            childCategory.setParent(null);
-            categoryRepository.save(childCategory);
+        subCategories.forEach(subCategory -> {
+            subCategory.setParent(null);
+            categoryRepository.save(subCategory);
         });
 
         categoryRepository.delete(category);

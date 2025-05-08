@@ -1,6 +1,6 @@
 package com.nr.ecommercebe.module.user.application.dto.validation;
 
-import com.nr.ecommercebe.shared.exception.AccessFieldException;
+import com.nr.ecommercebe.shared.exception.ServerErrorException;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
@@ -39,7 +39,7 @@ public class GenericPasswordMatchValidator implements ConstraintValidator<Passwo
 
             return valid;
         } catch (NoSuchFieldException | IllegalAccessException e) {
-            throw new AccessFieldException("Error accessing fields for password match validation: " + e.getMessage());
+            throw new ServerErrorException("Error accessing fields for password match validation", e);
         }
     }
 

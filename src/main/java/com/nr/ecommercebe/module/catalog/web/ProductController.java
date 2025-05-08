@@ -59,7 +59,7 @@ public class ProductController {
         return ResponseEntity.ok(product);
     }
 
-    @GetMapping("slug/{slug}")
+    @GetMapping("bySlug/{slug}")
     @Operation(
             summary = "Get product by slug",
             description = "Fetches a product by its slug",

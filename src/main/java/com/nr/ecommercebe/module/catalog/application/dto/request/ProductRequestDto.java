@@ -16,6 +16,7 @@ import java.util.Set;
 @Builder
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
 public class ProductRequestDto {
+    String id;
     @NotBlank(message = "Product name is required")
     String name;
 

@@ -1,6 +1,7 @@
 package com.nr.ecommercebe.shared.exception;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nr.ecommercebe.shared.dto.ErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpStatus;

@@ -28,6 +28,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+
 @Service
 @Transactional
 @Slf4j
@@ -56,6 +58,8 @@ public class AuthServiceImpl implements AuthService {
         UserResponseDto userResponse = mapper.toDTO(userDetails.user());
         userCacheService.cacheUser(userResponse);
 
+        log.info("User {} logged in at {}", userResponse.getId(), LocalDateTime.now());
+
         return LoginResponseDto.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
@@ -73,7 +77,10 @@ public class AuthServiceImpl implements AuthService {
         user.setPasswordHash(passwordEncoder.encode(registerRequestDto.getPassword()));
         user.setRole(roleCacheService.getRole(RoleName.USER));
 
-        return userRepository.save(user).getId();
+        User savedUser = userRepository.save(user);
+        log.info("User {} created at {}", savedUser.getId(), LocalDateTime.now());
+
+        return savedUser.getId();
     }
 
     @Override
@@ -97,6 +104,7 @@ public class AuthServiceImpl implements AuthService {
     public void logout(String refreshToken) {
         String userId = getUserIdFromToken(refreshToken);
         userCacheService.evictUserById(userId);
+        log.info("User {} logged out at {}", userId, LocalDateTime.now());
     }
 
     @Override
@@ -126,7 +134,7 @@ public class AuthServiceImpl implements AuthService {
         user.setPhone(updateUserInfoRequestDto.getPhone());
 
         userRepository.save(user);
-
+        log.info("User {} updated at {}", user.getId(), LocalDateTime.now());
         UserResponseDto userResponse = mapper.toDTO(user);
 
         userCacheService.cacheUser(userResponse);
@@ -147,6 +155,7 @@ public class AuthServiceImpl implements AuthService {
 
         user.setPasswordHash(passwordEncoder.encode(newPassword));
         userRepository.save(user);
+        log.info("User {} updated password at {}", user.getId(), LocalDateTime.now());
     }
 
     @Override

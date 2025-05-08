@@ -1,8 +1,8 @@
 package com.nr.ecommercebe.shared.exception.handler;
 
 import com.nr.ecommercebe.shared.exception.ErrorCode;
-import com.nr.ecommercebe.shared.exception.ErrorResponse;
-import com.nr.ecommercebe.shared.exception.RecordExists;
+import com.nr.ecommercebe.shared.dto.ErrorResponse;
+import com.nr.ecommercebe.shared.exception.RecordExistsException;
 import com.nr.ecommercebe.shared.exception.RecordNotFoundException;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -36,8 +36,8 @@ public class GlobalExceptionHandler {
                 .body(errorResponse);
     }
 
-    @ExceptionHandler(RecordExists.class)
-    public ResponseEntity<ErrorResponse> handleRecordExistsException(RecordExists ex, HttpServletRequest request) {
+    @ExceptionHandler(RecordExistsException.class)
+    public ResponseEntity<ErrorResponse> handleRecordExistsException(RecordExistsException ex, HttpServletRequest request) {
         ErrorResponse errorResponse = new ErrorResponse(
                 LocalDateTime.now(),
                 HttpStatus.CONFLICT.value(),

@@ -21,10 +21,10 @@ import java.util.Set;
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Product extends BaseEntity {
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false)
     String name;
 
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false)
     String slug;
 
     @Lob

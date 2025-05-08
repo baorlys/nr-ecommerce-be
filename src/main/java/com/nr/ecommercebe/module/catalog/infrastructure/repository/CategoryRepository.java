@@ -15,7 +15,7 @@ import java.util.Optional;
 
 @Repository
 public interface CategoryRepository extends JpaRepository<Category, String>, CategoryRepositoryCustom, JpaSpecificationExecutor<Category> {
-    @EntityGraph(attributePaths = "products, subCategories")
+    @EntityGraph(attributePaths = {"products","subCategories"})
     Optional<Category> findByIdAndDeletedIsFalse(String id);
 
     @EntityGraph(attributePaths = "subCategories")

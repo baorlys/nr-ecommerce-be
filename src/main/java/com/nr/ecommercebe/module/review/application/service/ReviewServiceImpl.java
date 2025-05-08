@@ -22,6 +22,9 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 @Service
 @Transactional
 @Slf4j
@@ -55,6 +58,8 @@ public class ReviewServiceImpl implements ReviewService {
                     .rating(request.getRating())
                     .comment(request.getComment())
                     .build());
+
+        log.info("Review created with id: {} at {}", createdReview.getId(), LocalDateTime.now());
 
         return mapper.map(createdReview, ReviewResponseDto.class);
     }

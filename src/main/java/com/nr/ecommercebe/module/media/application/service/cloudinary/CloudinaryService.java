@@ -9,7 +9,10 @@ import com.nr.ecommercebe.shared.exception.DeleteImageException;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -19,6 +22,7 @@ import java.net.URL;
 import java.util.Map;
 
 @Service
+@Slf4j
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class CloudinaryService implements MediaService {
@@ -30,16 +34,23 @@ public class CloudinaryService implements MediaService {
                 file.getBytes(),
                 ObjectUtils.asMap("folder", folderName)
         );
+        log.info("Image uploaded to Cloudinary: {}", data.get("url"));
         return (String) data.get("url");
     }
 
+    @Retryable(
+            retryFor = {DeleteImageException.class},
+            maxAttempts = 5,
+            backoff = @Backoff(delay = 5000))
     @RabbitListener(queues = RabbitConfig.IMAGE_DELETE_QUEUE)
     public void deleteImage(ImageDeleteEvent event) {
         try {
             String publicId = extractPublicIdFromUrl(event.getImageUrl());
             cloudinary.uploader().destroy(publicId, ObjectUtils.emptyMap());
+            log.info("Image deleted from Cloudinary: {}", event.getImageUrl());
         } catch (Exception e) {
-            throw new DeleteImageException("Failed to delete image: " + e.getMessage());
+            log.error("Failed to delete image from Cloudinary: {}", event.getImageUrl(), e);
+            throw new DeleteImageException("Failed to delete image" , e);
         }
     }
 
