@@ -1,6 +1,6 @@
 # E-Commerce Backend
 
-This is the backend of an e-commerce application built with **Spring Boot**. It provides a robust and scalable REST API for managing the core functionalities of an online shopping platform.
+This is the backend of an e-commerce application built with **Spring Boot**. It provides a robust and scalable REST API for managing the core functionalities of an online shopping platform. Built with a modular architecture, it allows for easy maintenance and extensibility.
 
 ## Features
 
@@ -21,6 +21,10 @@ This is the backend of an e-commerce application built with **Spring Boot**. It 
 - **Hibernate**: ORM for database interactions.
 - **PostgreSQL**: Relational database for data storage.
 - **RabbitMQ**: Message broker for asynchronous tasks (e.g., image deletion).
+- **Redis**: In-memory data structure store for caching.
+- **Spring Web**: For building RESTful APIs.
+- **Spring Data JPA**: Simplifies database access and CRUD operations.
+- **Spring Security**: Authentication and authorization.
 - **Cloudinary**: Cloud-based image management service.
 - **JUnit & Mockito**: Unit and integration testing.
 - **Lombok**: Simplifies Java code with annotations.
@@ -46,6 +50,7 @@ This is the backend of an e-commerce application built with **Spring Boot**. It 
 - **Java** (>= 17)
 - **Maven** (>= 3.8)
 - **PostgreSQL** (or any supported database)
+- **Redis** (for caching)
 - **RabbitMQ** (for message queuing)
 
 ### Installation
