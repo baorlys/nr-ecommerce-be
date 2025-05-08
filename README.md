@@ -4,16 +4,16 @@ This is the backend of an e-commerce application built with **Spring Boot**. It 
 
 ## Features
 
-- **User Management**: User authentication, role-based access control, and profile management.
-- **Product Management**: CRUD operations for products, categories, and variants.
-- **Shopping Cart**: Add, update, and remove items from the cart.
-- **Order Management**: Place orders, view order history, and manage order statuses.
-- **Review System**: Add, edit, and delete product reviews with eligibility checks.
-- **Admin Dashboard**: Manage users, products, and categories.
-- **Media Management**: Upload and delete product images using Cloudinary.
-- **Search and Filtering**: Advanced search and filtering for products.
-- **Pagination**: Support for paginated API responses.
-- **Error Handling**: Centralized exception handling with meaningful error messages.
+- [x] **User Management**: User authentication, role-based access control, and profile management.
+- [x] **Product Management**: CRUD operations for products, categories, and variants.
+- [x] **Shopping Cart**: Add, update, and remove items from the cart.
+- [ ] **Order Management**: Place orders, view order history, and manage order statuses.
+- [x] **Review System**: Add, edit, and delete product reviews with eligibility checks.
+- [x] **Admin Dashboard**: Manage users, products, and categories.
+- [x] **Media Management**: Upload and delete product images using Cloudinary.
+- [x] **Search and Filtering**: Advanced search and filtering for products.
+- [x] **Pagination**: Support for paginated API responses.
+- [x] **Error Handling**: Centralized exception handling with meaningful error messages.
 
 ## Tech Stack
 
