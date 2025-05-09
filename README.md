@@ -58,7 +58,7 @@ This is the backend of an e-commerce application built with **Spring Boot**. It 
 1. Clone the repository:
 
     ```sh
-    git clone https://github.com/your-username/ecommerce-be.git
+    git clone https://github.com/baorlys/nr-ecommerce-be.git
     cd ecommerce-be
     ```
 
